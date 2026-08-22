@@ -13,6 +13,19 @@ npm run dev
 
 Open [http://localhost:3000](http://localhost:3000).
 
+## Telegram buyurtmalar (Vercel)
+
+Checkout paytida buyurtma Telegramga yuboriladi. Lokal va Vercel uchun `.env.local` / Environment Variables:
+
+```env
+TELEGRAM_BOT_TOKEN=your_bot_token
+TELEGRAM_CHAT_ID=your_chat_id
+```
+
+Vercel: **Project → Settings → Environment Variables** — ikkala o‘zgaruvchini qo‘shing va redeploy qiling.
+
+API route: `POST /api/telegram/order`
+
 ## Pages
 
 | Route | Description |

@@ -48,6 +48,7 @@ interface StoreContextValue {
     address: string;
     note: string;
   }) => OrderRecord;
+  commitOrder: (order: OrderRecord) => void;
 }
 
 const StoreContext = createContext<StoreContextValue | null>(null);
@@ -71,6 +72,7 @@ export function StoreProvider({ children }: { children: ReactNode }) {
   const [wishlist, setWishlist] = useState<string[]>([]);
   const [orders, setOrders] = useState<OrderRecord[]>([]);
   const [ready, setReady] = useState(false);
+  const [toast, setToast] = useState<string | null>(null);
 
   useEffect(() => {
     setCart(loadJSON(CART_KEY, []));
@@ -94,6 +96,12 @@ export function StoreProvider({ children }: { children: ReactNode }) {
     localStorage.setItem(ORDERS_KEY, JSON.stringify(orders));
   }, [orders, ready]);
 
+  useEffect(() => {
+    if (!toast) return;
+    const timer = window.setTimeout(() => setToast(null), 3200);
+    return () => window.clearTimeout(timer);
+  }, [toast]);
+
   const addToCart = useCallback(
     (productId: string, color: ProductColor, qty = 1) => {
       setCart((prev) => {
@@ -107,6 +115,13 @@ export function StoreProvider({ children }: { children: ReactNode }) {
         }
         return [...prev, { productId, color, qty }];
       });
+
+      const product = getProductByCode(productId);
+      setToast(
+        product
+          ? `«${product.nameUz}» savatga qo‘shildi`
+          : "Mahsulot savatga qo‘shildi",
+      );
     },
     [],
   );
@@ -149,6 +164,11 @@ export function StoreProvider({ children }: { children: ReactNode }) {
     (productId: string) => wishlist.includes(productId),
     [wishlist],
   );
+
+  const commitOrder = useCallback((order: OrderRecord) => {
+    setOrders((prev) => [order, ...prev]);
+    setCart([]);
+  }, []);
 
   const placeOrder = useCallback(
     (data: {
@@ -204,6 +224,7 @@ export function StoreProvider({ children }: { children: ReactNode }) {
       toggleWishlist,
       isWishlisted,
       placeOrder,
+      commitOrder,
     }),
     [
       cart,
@@ -218,11 +239,22 @@ export function StoreProvider({ children }: { children: ReactNode }) {
       toggleWishlist,
       isWishlisted,
       placeOrder,
+      commitOrder,
     ],
   );
 
   return (
-    <StoreContext.Provider value={value}>{children}</StoreContext.Provider>
+    <StoreContext.Provider value={value}>
+      {children}
+      {toast && (
+        <div className="toast-enter fixed bottom-6 left-1/2 z-[100] flex max-w-[min(92vw,24rem)] -translate-x-1/2 items-center gap-3 rounded-2xl border border-line bg-brand px-4 py-3.5 text-sm font-medium text-white shadow-xl">
+          <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-cyan text-brand">
+            ✓
+          </span>
+          <span>{toast}</span>
+        </div>
+      )}
+    </StoreContext.Provider>
   );
 }
 

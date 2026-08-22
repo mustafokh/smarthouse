@@ -5,17 +5,19 @@ import { FormEvent, useState } from "react";
 import { useRouter } from "next/navigation";
 import { formatPrice } from "@/data/products";
 import { DELIVERY, OWNER_PHONE } from "@/data/contact";
+import { createOrderRecord } from "@/lib/order";
 import { useStore } from "@/lib/store";
 import { SectionHeading } from "@/components/ProductCard";
 
 export default function CheckoutPage() {
-  const { cart, cartTotal, placeOrder } = useStore();
+  const { cart, cartTotal, commitOrder } = useStore();
   const router = useRouter();
   const [name, setName] = useState("");
   const [phone, setPhone] = useState("");
   const [address, setAddress] = useState("");
   const [note, setNote] = useState("");
   const [error, setError] = useState("");
+  const [submitting, setSubmitting] = useState(false);
 
   if (cart.length === 0) {
     return (
@@ -31,14 +33,40 @@ export default function CheckoutPage() {
     );
   }
 
-  function onSubmit(e: FormEvent) {
+  async function onSubmit(e: FormEvent) {
     e.preventDefault();
     if (!name.trim() || !phone.trim()) {
       setError("Ism va telefon majburiy.");
       return;
     }
-    const order = placeOrder({ name, phone, address, note });
-    router.push(`/buyurtmalar?ok=${order.id}`);
+
+    setError("");
+    setSubmitting(true);
+
+    const order = createOrderRecord(cart, { name, phone, address, note });
+
+    try {
+      const response = await fetch("/api/telegram/order", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(order),
+      });
+
+      if (!response.ok) {
+        const data = (await response.json().catch(() => null)) as {
+          error?: string;
+        } | null;
+        setError(data?.error ?? "Buyurtmani yuborishda xatolik. Qayta urinib ko‘ring.");
+        setSubmitting(false);
+        return;
+      }
+
+      commitOrder(order);
+      router.push(`/buyurtmalar?ok=${order.id}`);
+    } catch {
+      setError("Tarmoq xatoligi — internetni tekshirib, qayta urinib ko‘ring.");
+      setSubmitting(false);
+    }
   }
 
   return (
@@ -81,9 +109,10 @@ export default function CheckoutPage() {
           {error && <p className="text-sm text-red-600">{error}</p>}
           <button
             type="submit"
-            className="w-full rounded-xl bg-cyan py-3.5 text-sm font-bold text-brand hover:bg-cyan-soft"
+            disabled={submitting}
+            className="w-full rounded-xl bg-cyan py-3.5 text-sm font-bold text-brand hover:bg-cyan-soft disabled:cursor-not-allowed disabled:opacity-60"
           >
-            Buyurtmani yuborish
+            {submitting ? "Yuborilmoqda…" : "Buyurtmani yuborish"}
           </button>
           <p className="text-center text-xs text-muted">
             Savol bo‘lsa:{" "}
