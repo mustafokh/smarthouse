@@ -1,0 +1,184 @@
+@import "tailwindcss";
+
+:root {
+  --brand: #0c1f44;
+  --brand-deep: #071428;
+  --cyan: #2fb6d9;
+  --cyan-soft: #7ad4eb;
+  --mist: #e8f4f8;
+  --fog: #f4f8fb;
+  --line: #d5e4ec;
+  --ink: #0c1f44;
+  --muted: #5a6f86;
+  --surface: #ffffff;
+  --background: #f4f8fb;
+  --foreground: #0c1f44;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-brand: var(--brand);
+  --color-brand-deep: var(--brand-deep);
+  --color-cyan: var(--cyan);
+  --color-cyan-soft: var(--cyan-soft);
+  --color-mist: var(--mist);
+  --color-fog: var(--fog);
+  --color-line: var(--line);
+  --color-ink: var(--ink);
+  --color-muted: var(--muted);
+  --color-surface: var(--surface);
+  --font-sans: var(--font-body);
+  --font-display: var(--font-display);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: var(--font-body), system-ui, sans-serif;
+  min-height: 100vh;
+}
+
+::selection {
+  background: color-mix(in srgb, var(--cyan) 35%, white);
+  color: var(--brand);
+}
+
+.font-display {
+  font-family: var(--font-display), var(--font-body), sans-serif;
+}
+
+/* Atmospheric circuit pattern */
+.bg-circuit {
+  background-color: var(--fog);
+  background-image:
+    linear-gradient(
+      135deg,
+      color-mix(in srgb, var(--brand) 6%, transparent) 0%,
+      transparent 40%
+    ),
+    linear-gradient(
+      45deg,
+      transparent 40%,
+      color-mix(in srgb, var(--cyan) 8%, transparent) 100%
+    ),
+    repeating-linear-gradient(
+      -32deg,
+      transparent,
+      transparent 18px,
+      color-mix(in srgb, var(--brand) 5%, transparent) 18px,
+      color-mix(in srgb, var(--brand) 5%, transparent) 19px
+    );
+}
+
+.bg-hero {
+  background:
+    radial-gradient(
+      ellipse 80% 60% at 70% 20%,
+      color-mix(in srgb, var(--cyan) 28%, transparent),
+      transparent 55%
+    ),
+    radial-gradient(
+      ellipse 50% 40% at 15% 80%,
+      color-mix(in srgb, var(--brand) 18%, transparent),
+      transparent 50%
+    ),
+    linear-gradient(165deg, #071428 0%, #0c1f44 45%, #123a5c 100%);
+}
+
+@keyframes rise-in {
+  from {
+    opacity: 0;
+    transform: translateY(18px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes soft-pulse {
+  0%,
+  100% {
+    opacity: 0.45;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.75;
+    transform: scale(1.04);
+  }
+}
+
+@keyframes drift {
+  0% {
+    transform: translate3d(0, 0, 0);
+  }
+  50% {
+    transform: translate3d(12px, -8px, 0);
+  }
+  100% {
+    transform: translate3d(0, 0, 0);
+  }
+}
+
+.animate-rise {
+  animation: rise-in 0.7s ease-out both;
+}
+
+.animate-rise-delay {
+  animation: rise-in 0.8s ease-out 0.15s both;
+}
+
+.animate-rise-delay-2 {
+  animation: rise-in 0.85s ease-out 0.3s both;
+}
+
+.animate-pulse-soft {
+  animation: soft-pulse 5s ease-in-out infinite;
+}
+
+.animate-drift {
+  animation: drift 12s ease-in-out infinite;
+}
+
+.product-shine {
+  position: relative;
+  overflow: hidden;
+}
+
+.product-shine::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    105deg,
+    transparent 40%,
+    color-mix(in srgb, white 35%, transparent) 50%,
+    transparent 60%
+  );
+  transform: translateX(-120%);
+  transition: transform 0.7s ease;
+  pointer-events: none;
+}
+
+.product-shine:hover::after {
+  transform: translateX(120%);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-rise,
+  .animate-rise-delay,
+  .animate-rise-delay-2,
+  .animate-pulse-soft,
+  .animate-drift {
+    animation: none;
+  }
+}
