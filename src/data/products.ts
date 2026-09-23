@@ -6,7 +6,8 @@ export type ProductColor =
   | "rgb"
   | "yellow"
   | "pink"
-  | "teal";
+  | "teal"
+  | "green";
 
 export type Protocol = "wifi" | "zigbee" | "yandex";
 
@@ -45,7 +46,8 @@ export const colorLabels: Record<ProductColor, string> = {
   rgb: "RGB",
   yellow: "Sariq",
   pink: "Pushti",
-  teal: "Moviy-yashil",
+  teal: "Moviy",
+  green: "Yashil",
 };
 
 export const categories: Category[] = [
@@ -105,7 +107,7 @@ export const categories: Category[] = [
     id: "kolonkalar",
     slug: "kolonkalar",
     name: "Smart kolonkalar",
-    description: "Yandex Stansiya Midi — ovozli yordamchi va musiqa.",
+    description: "Yandex Stansiya Midi va Layt — ovozli yordamchi Alice.",
     icon: "speaker",
   },
 ];
@@ -603,6 +605,36 @@ export const products: Product[] = [
       gray: "/products/YSM-001-gray.png",
       pink: "/products/YSM-001-pink.png",
       teal: "/products/YSM-001-teal.png",
+    },
+    featured: true,
+  },
+  {
+    id: "YSL-001",
+    slug: "yandex-stansiya-layt",
+    code: "YSL-001",
+    name: "Yandex Stansiya Layt",
+    nameUz: "Yandex Layt (3 soatli)",
+    category: "kolonkalar",
+    price: 70,
+    currency: "USD",
+    protocol: "yandex",
+    colors: ["pink", "green", "teal"],
+    shortDescription:
+      "Yandex Layt — portativ smart kolonka, ~3 soat batareya.",
+    description:
+      "Yandex Stansiya Layt (3 soatli) — Alice ovozli yordamchi bilan ixcham smart kolonka. Portativ batareya (~3 soat), musiqa va smart uy bilan ishlaydi. Pushti, yashil va moviy ranglarda.",
+    specs: [
+      "Yandex Alice",
+      "~3 soat batareya",
+      "Wi-Fi",
+      "Portativ",
+      "3 rang",
+    ],
+    image: "/products/YSL-001.png",
+    imagesByColor: {
+      pink: "/products/YSL-001-pink.png",
+      green: "/products/YSL-001-green.png",
+      teal: "/products/YSL-001-teal.png",
     },
     featured: true,
   },

@@ -112,7 +112,8 @@ const COLOR_SWATCH: Record<ProductColor, string> = {
   rgb: "conic-gradient(red, yellow, lime, aqua, blue, magenta, red)",
   yellow: "#e8b923",
   pink: "#d94f8c",
-  teal: "#2aa8a0",
+  teal: "#2aa8d0",
+  green: "#7cb82f",
 };
 
 export function ColorDots({

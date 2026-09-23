@@ -5,20 +5,20 @@ import { useEffect, useState } from "react";
 
 const SLIDES = [
   {
+    src: "/products/YSL-001-pink.png",
+    label: "Yandex Layt",
+  },
+  {
     src: "/products/YSM-001-yellow.png",
     label: "Yandex Stansiya Midi",
   },
   {
-    src: "/products/VKL-002.png",
-    label: "Sensorli viklyuchatel",
+    src: "/products/YSL-001-green.png",
+    label: "Yandex Layt yashil",
   },
   {
-    src: "/products/TGW-60W.png",
-    label: "Smart termostat",
-  },
-  {
-    src: "/products/SMZ-001.png",
-    label: "Smart motor",
+    src: "/products/YSL-001-teal.png",
+    label: "Yandex Layt moviy",
   },
 ] as const;
 
@@ -33,8 +33,8 @@ export function HeroProductCarousel() {
   }, []);
 
   return (
-    <div className="relative h-36 w-36 shrink-0 sm:h-52 sm:w-52">
-      <div className="absolute inset-0 overflow-hidden rounded-[1.5rem] bg-white/95 shadow-[0_16px_40px_-12px_rgba(15,23,42,0.35)] ring-1 ring-white/50 sm:rounded-[1.75rem]">
+    <div className="relative w-full">
+      <div className="relative aspect-[4/3] w-full overflow-hidden sm:aspect-[16/10] md:aspect-[2/1]">
         {SLIDES.map((slide, i) => (
           <div
             key={slide.src}
@@ -46,15 +46,15 @@ export function HeroProductCarousel() {
               src={slide.src}
               alt={slide.label}
               fill
-              className="object-contain p-3 sm:p-5"
-              sizes="(max-width:640px) 144px, 208px"
+              className="object-contain p-2 sm:p-4"
+              sizes="(max-width:768px) 100vw, 960px"
               priority={i === 0}
             />
           </div>
         ))}
       </div>
 
-      <div className="absolute -bottom-3 left-1/2 flex -translate-x-1/2 gap-1.5">
+      <div className="mt-2 flex justify-center gap-1.5 pb-1">
         {SLIDES.map((slide, i) => (
           <button
             key={slide.src}
@@ -62,7 +62,7 @@ export function HeroProductCarousel() {
             aria-label={slide.label}
             onClick={() => setIndex(i)}
             className={`h-1.5 rounded-full transition-all ${
-              i === index ? "w-5 bg-white" : "w-1.5 bg-white/50"
+              i === index ? "w-5 bg-white" : "w-1.5 bg-white/45"
             }`}
           />
         ))}

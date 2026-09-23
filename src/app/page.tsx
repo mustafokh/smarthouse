@@ -14,33 +14,26 @@ export default function HomePage() {
   return (
     <div className="soft-page">
       <div className="mx-auto max-w-6xl px-4 pb-16 pt-6 sm:px-6">
-        <section className="promo-banner animate-rise relative overflow-hidden rounded-[1.5rem] px-4 py-6 text-white shadow-[0_20px_50px_-20px_rgba(37,99,235,0.55)] sm:rounded-[1.75rem] sm:px-10 sm:py-10">
+        <section className="promo-banner animate-rise relative overflow-hidden rounded-[1.5rem] text-white shadow-[0_20px_50px_-20px_rgba(37,99,235,0.55)] sm:rounded-[1.75rem]">
           <div
-            className="pointer-events-none absolute -right-6 top-1/2 h-40 w-40 -translate-y-1/2 rounded-full bg-white/15 blur-2xl sm:h-56 sm:w-56"
+            className="pointer-events-none absolute -right-8 top-0 h-48 w-48 rounded-full bg-white/15 blur-2xl sm:h-64 sm:w-64"
             aria-hidden
           />
-          <div className="relative flex flex-col items-center gap-6 text-center sm:flex-row sm:items-center sm:justify-between sm:gap-8 sm:text-left">
-            <div className="max-w-md">
-              <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-white/80 sm:text-xs">
-                {t("hero_eyebrow")}
-              </p>
-              <h1 className="mt-2 font-display text-[1.65rem] font-extrabold leading-tight sm:text-4xl">
-                {t("hero_title_1")}
-                <span className="block">{t("hero_title_2")}</span>
-              </h1>
-              <p className="mt-3 text-sm text-white/85 sm:text-base">
-                {t("hero_sub")}
-              </p>
-              <Link
-                href="/katalog"
-                className="mt-5 inline-flex rounded-full bg-white px-5 py-3 text-sm font-bold text-accent shadow-lg transition hover:bg-slate-50 sm:mt-6 sm:px-6"
-              >
-                {t("hero_cta")}
-              </Link>
-            </div>
-            <div className="animate-float shrink-0">
-              <HeroProductCarousel />
-            </div>
+          <div className="relative px-4 pt-5 sm:px-8 sm:pt-7">
+            <p className="text-center text-[11px] font-semibold uppercase tracking-[0.2em] text-white/80 sm:text-xs">
+              {t("hero_eyebrow")}
+            </p>
+            <h1 className="mt-2 text-center font-display text-[1.55rem] font-extrabold leading-tight sm:text-4xl">
+              {t("hero_title_1")}
+              <span className="block">{t("hero_title_2")}</span>
+            </h1>
+            <p className="mx-auto mt-2 max-w-lg text-center text-sm text-white/85 sm:mt-3 sm:text-base">
+              {t("hero_sub")}
+            </p>
+          </div>
+
+          <div className="relative mt-3 px-2 pb-3 sm:mt-4 sm:px-4 sm:pb-4">
+            <HeroProductCarousel />
           </div>
         </section>
 

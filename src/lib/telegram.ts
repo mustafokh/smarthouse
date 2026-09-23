@@ -394,6 +394,9 @@ function parseColorToken(raw: string): string | null {
     pink: "pink",
     pushti: "pink",
     teal: "teal",
+    moviy: "teal",
+    green: "green",
+    yashil: "green",
   };
   return map[raw.toLowerCase()] ?? null;
 }
