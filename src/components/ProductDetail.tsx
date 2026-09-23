@@ -97,6 +97,7 @@ export function ProductDetail({ product }: { product: Product }) {
                   colors={product.colors}
                   value={color}
                   onChange={setColor}
+                  imagesByColor={product.imagesByColor}
                 />
               </div>
             </div>

@@ -11,6 +11,12 @@ import {
 } from "react";
 import type { ProductColor } from "@/data/products";
 import { getProductByCode, products } from "@/data/products";
+import {
+  calcNasiya,
+  toNasiyaPlan,
+  type NasiyaPlan,
+  type PaymentMethod,
+} from "@/lib/nasiya";
 
 export interface CartItem {
   productId: string;
@@ -28,6 +34,8 @@ export interface OrderRecord {
   items: CartItem[];
   total: number;
   status: "yangi" | "ko'rib chiqilmoqda" | "tasdiqlangan";
+  paymentMethod: PaymentMethod;
+  nasiyaPlan?: NasiyaPlan;
 }
 
 interface StoreContextValue {
@@ -47,6 +55,7 @@ interface StoreContextValue {
     phone: string;
     address: string;
     note: string;
+    paymentMethod?: PaymentMethod;
   }) => OrderRecord;
   commitOrder: (order: OrderRecord) => void;
 }
@@ -176,18 +185,31 @@ export function StoreProvider({ children }: { children: ReactNode }) {
       phone: string;
       address: string;
       note: string;
+      paymentMethod?: PaymentMethod;
     }) => {
       const total = cart.reduce((sum, item) => {
         const p = getProductByCode(item.productId);
         return sum + (p?.price ?? 0) * item.qty;
       }, 0);
+
+      const requested = data.paymentMethod ?? "full";
+      const nasiya = calcNasiya(total);
+      const paymentMethod: PaymentMethod =
+        requested === "nasiya" && nasiya.eligible ? "nasiya" : "full";
+
       const order: OrderRecord = {
         id: `SH-${Date.now().toString(36).toUpperCase()}`,
         createdAt: new Date().toISOString(),
-        ...data,
+        name: data.name,
+        phone: data.phone,
+        address: data.address,
+        note: data.note,
         items: [...cart],
         total,
         status: "yangi",
+        paymentMethod,
+        nasiyaPlan:
+          paymentMethod === "nasiya" ? toNasiyaPlan(nasiya) : undefined,
       };
       setOrders((prev) => [order, ...prev]);
       setCart([]);

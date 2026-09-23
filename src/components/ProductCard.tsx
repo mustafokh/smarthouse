@@ -76,25 +76,42 @@ export function ProductCard({ product }: { product: Product }) {
   );
 }
 
+const COLOR_SWATCH: Record<ProductColor, string> = {
+  white: "#f5f7fa",
+  black: "#1a1a1a",
+  gold: "#c9a227",
+  gray: "#8a93a0",
+  rgb: "conic-gradient(red, yellow, lime, aqua, blue, magenta, red)",
+  yellow: "#e8b923",
+  pink: "#d94f8c",
+  teal: "#2aa8a0",
+};
+
+/** Photo stickers when imagesByColor is available; otherwise flat color dots. */
 export function ColorDots({
   colors,
   value,
   onChange,
+  imagesByColor,
 }: {
   colors: ProductColor[];
   value: ProductColor;
   onChange: (c: ProductColor) => void;
+  imagesByColor?: Partial<Record<ProductColor, string>>;
 }) {
-  const map: Record<ProductColor, string> = {
-    white: "#f5f7fa",
-    black: "#1a1a1a",
-    gold: "#c9a227",
-    gray: "#8a93a0",
-    rgb: "conic-gradient(red, yellow, lime, aqua, blue, magenta, red)",
-    yellow: "#e8b923",
-    pink: "#d94f8c",
-    teal: "#2aa8a0",
-  };
+  const useStickers =
+    !!imagesByColor && colors.some((c) => Boolean(imagesByColor[c]));
+
+  if (useStickers && imagesByColor) {
+    return (
+      <ColorStickers
+        colors={colors}
+        value={value}
+        onChange={onChange}
+        imagesByColor={imagesByColor}
+      />
+    );
+  }
 
   return (
     <div className="flex flex-wrap gap-2">
@@ -105,14 +122,64 @@ export function ColorDots({
           onClick={() => onChange(c)}
           title={colorLabels[c]}
           className={`flex h-9 w-9 items-center justify-center rounded-full border-2 transition ${
-            value === c ? "border-cyan scale-110" : "border-line"
+            value === c ? "scale-110 border-cyan" : "border-line"
           }`}
-          style={{
-            background: map[c],
-          }}
+          style={{ background: COLOR_SWATCH[c] }}
           aria-label={colorLabels[c]}
         />
       ))}
+    </div>
+  );
+}
+
+/** Circular product-photo stickers for multi-color SKUs (e.g. Yandex Stansiya Midi). */
+export function ColorStickers({
+  colors,
+  value,
+  onChange,
+  imagesByColor,
+}: {
+  colors: ProductColor[];
+  value: ProductColor;
+  onChange: (c: ProductColor) => void;
+  imagesByColor: Partial<Record<ProductColor, string>>;
+}) {
+  return (
+    <div className="flex flex-wrap gap-2.5">
+      {colors.map((c) => {
+        const src = imagesByColor[c];
+        const selected = value === c;
+        return (
+          <button
+            key={c}
+            type="button"
+            onClick={() => onChange(c)}
+            title={colorLabels[c]}
+            aria-label={colorLabels[c]}
+            aria-pressed={selected}
+            className={`relative h-14 w-14 overflow-hidden rounded-2xl border-2 bg-mist shadow-sm transition sm:h-16 sm:w-16 ${
+              selected
+                ? "scale-105 border-cyan ring-2 ring-cyan/30"
+                : "border-line hover:border-cyan/50"
+            }`}
+          >
+            {src ? (
+              <Image
+                src={src}
+                alt={colorLabels[c]}
+                fill
+                className="object-contain p-1"
+                sizes="64px"
+              />
+            ) : (
+              <span
+                className="absolute inset-2 rounded-full"
+                style={{ background: COLOR_SWATCH[c] }}
+              />
+            )}
+          </button>
+        );
+      })}
     </div>
   );
 }
