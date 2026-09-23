@@ -1,6 +1,14 @@
-export type ProductColor = "white" | "black" | "gold" | "gray" | "rgb";
+export type ProductColor =
+  | "white"
+  | "black"
+  | "gold"
+  | "gray"
+  | "rgb"
+  | "yellow"
+  | "pink"
+  | "teal";
 
-export type Protocol = "wifi" | "zigbee";
+export type Protocol = "wifi" | "zigbee" | "yandex";
 
 export interface Product {
   id: string;
@@ -17,6 +25,7 @@ export interface Product {
   description: string;
   specs: string[];
   image: string;
+  imagesByColor?: Partial<Record<ProductColor, string>>;
   featured?: boolean;
 }
 
@@ -34,6 +43,9 @@ export const colorLabels: Record<ProductColor, string> = {
   gold: "Oltin",
   gray: "Kulrang",
   rgb: "RGB",
+  yellow: "Sariq",
+  pink: "Pushti",
+  teal: "Moviy-yashil",
 };
 
 export const categories: Category[] = [
@@ -88,6 +100,13 @@ export const categories: Category[] = [
     name: "Yoritish va boshqaruv",
     description: "RGB smart lampochka va Wi-Fi IR pult.",
     icon: "bulb",
+  },
+  {
+    id: "kolonkalar",
+    slug: "kolonkalar",
+    name: "Smart kolonkalar",
+    description: "Yandex Stansiya Midi — ovozli yordamchi va musiqa.",
+    icon: "speaker",
   },
 ];
 
@@ -554,6 +573,38 @@ export const products: Product[] = [
       "Konditsioner, TV va boshqa IR qurilmalarni telefongan smart IR pult. Yagona hub sifatida ishlaydi.",
     specs: ["Wi-Fi", "Infrared (IR)", "TV / konditsioner", "Qora"],
     image: "/products/WLP-002.png",
+  },
+  {
+    id: "YSM-001",
+    slug: "yandex-stansiya-midi",
+    code: "YSM-001",
+    name: "Yandex Stansiya Midi",
+    nameUz: "Yandex Stansiya Midi",
+    category: "kolonkalar",
+    price: 170,
+    currency: "USD",
+    protocol: "yandex",
+    colors: ["yellow", "black", "gray", "pink", "teal"],
+    shortDescription:
+      "Yandex Stansiya Midi — ovozli yordamchi Alice, soat va musiqa.",
+    description:
+      "Yandex Stansiya Midi smart kolonka. Alice ovozli yordamchi, LED soat, musiqa va smart uy bilan integratsiya. 5 xil rangda mavjud.",
+    specs: [
+      "Yandex Alice",
+      "LED soat",
+      "Wi-Fi",
+      "5 rang",
+      "Smart uy integratsiyasi",
+    ],
+    image: "/products/YSM-001.png",
+    imagesByColor: {
+      yellow: "/products/YSM-001-yellow.png",
+      black: "/products/YSM-001-black.png",
+      gray: "/products/YSM-001-gray.png",
+      pink: "/products/YSM-001-pink.png",
+      teal: "/products/YSM-001-teal.png",
+    },
+    featured: true,
   },
 ];
 

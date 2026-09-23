@@ -6,12 +6,12 @@ export const BRAND = {
 
 /** Owner phone — used for all call / contact CTAs (not a placeholder). */
 export const OWNER_PHONE = {
-  e164: "+998953330135",
-  display: "+998 95 333 01 35",
-  telHref: "tel:+998953330135",
+  e164: "+998991041411",
+  display: "+998 99 104 14 11",
+  telHref: "tel:+998991041411",
 } as const;
 
-export const TELEGRAM_URL = "https://t.me/smarthouse777";
+export const TELEGRAM_URL = "https://t.me/yusuf_7872";
 
 /** Delivery policy copy (Uzbek) */
 export const DELIVERY = {

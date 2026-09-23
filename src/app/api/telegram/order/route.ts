@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import type { OrderRecord } from "@/lib/store";
-import { formatOrderTelegramMessage, sendTelegramMessage } from "@/lib/telegram";
+import { notifyNewOrder } from "@/lib/telegram";
 
 export async function POST(request: Request) {
   try {
@@ -19,9 +19,7 @@ export async function POST(request: Request) {
       );
     }
 
-    const message = formatOrderTelegramMessage(order);
-    await sendTelegramMessage(message);
-
+    await notifyNewOrder(order);
     return NextResponse.json({ ok: true });
   } catch (error) {
     console.error("[telegram/order]", error);

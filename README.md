@@ -15,16 +15,30 @@ Open [http://localhost:3000](http://localhost:3000).
 
 ## Telegram buyurtmalar (Vercel)
 
-Checkout paytida buyurtma Telegramga yuboriladi. Lokal va Vercel uchun `.env.local` / Environment Variables:
+Checkout paytida buyurtma Telegramga yuboriladi. Bot orqali sotuv nazorati:
+
+- `/statistika` — umumiy sotuv
+- `/oylik` — oylik hisobot (`/oylik 2026-09`)
+- `/buyurtmalar` — so‘nggi buyurtmalar
+- `/kirim` / `/chiqim 50 izoh` / `/chiqimlar` / `/balans`
+- `/mahsulotlar` — eng ko‘p sotilganlar
+
+Lokal / Vercel Environment Variables:
 
 ```env
 TELEGRAM_BOT_TOKEN=your_bot_token
 TELEGRAM_CHAT_ID=your_chat_id
+TELEGRAM_SETUP_SECRET=smarthouse777
+NEXT_PUBLIC_SITE_URL=https://smarthouse777.uz
 ```
 
-Vercel: **Project → Settings → Environment Variables** — ikkala o‘zgaruvchini qo‘shing va redeploy qiling.
+Deploydan keyin webhookni bir marta ulang:
 
-API route: `POST /api/telegram/order`
+`https://smarthouse777.uz/api/telegram/setup?secret=smarthouse777`
+
+Ixtiyoriy (Vercelda ma’lumot barqaror saqlansin): Upstash Redis `UPSTASH_REDIS_REST_URL` + `UPSTASH_REDIS_REST_TOKEN`.
+
+API: `POST /api/telegram/order` · `POST /api/telegram/webhook`
 
 ## Pages
 

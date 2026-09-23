@@ -35,6 +35,8 @@ export function ProductDetail({ product }: { product: Product }) {
   );
 
   const wish = isWishlisted(product.id);
+  const displayImage =
+    product.imagesByColor?.[color] ?? product.image;
 
   return (
     <div className="bg-circuit min-h-screen">
@@ -59,12 +61,13 @@ export function ProductDetail({ product }: { product: Product }) {
         </nav>
 
         <div className="mt-8 grid gap-10 lg:grid-cols-2">
-          <div className="relative aspect-square overflow-hidden rounded-3xl border border-line bg-gradient-to-br from-white to-mist">
+          <div className="relative aspect-square overflow-hidden rounded-3xl border border-line bg-gradient-to-br from-white to-mist shadow-sm">
             <Image
-              src={product.image}
+              key={displayImage}
+              src={displayImage}
               alt={product.nameUz}
               fill
-              className="object-contain p-8"
+              className="object-contain p-6 sm:p-10"
               sizes="(max-width:1024px) 100vw, 50vw"
               priority
             />

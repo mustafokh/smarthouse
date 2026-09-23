@@ -19,13 +19,13 @@ export function ProductCard({ product }: { product: Product }) {
     <article className="group flex flex-col overflow-hidden rounded-xl border border-line bg-surface shadow-[0_8px_30px_-18px_rgba(12,31,68,0.35)] transition hover:-translate-y-0.5 hover:shadow-[0_16px_40px_-20px_rgba(47,182,217,0.45)] sm:rounded-2xl">
       <Link
         href={`/mahsulot/${product.slug}`}
-        className="product-shine relative block aspect-[4/3] bg-gradient-to-br from-mist to-white"
+        className="product-shine relative block aspect-square bg-gradient-to-br from-mist to-white"
       >
         <Image
           src={product.image}
           alt={product.nameUz}
           fill
-          className="object-contain p-2 sm:p-4 transition duration-500 group-hover:scale-[1.03]"
+          className="object-contain p-3 sm:p-5 transition duration-500 group-hover:scale-[1.03]"
           sizes="(max-width:768px) 50vw, 25vw"
         />
         <span className="absolute left-1.5 top-1.5 rounded bg-brand/90 px-1.5 py-0.5 text-[9px] font-semibold uppercase tracking-wider text-cyan sm:left-3 sm:top-3 sm:px-2 sm:text-[10px]">
@@ -91,6 +91,9 @@ export function ColorDots({
     gold: "#c9a227",
     gray: "#8a93a0",
     rgb: "conic-gradient(red, yellow, lime, aqua, blue, magenta, red)",
+    yellow: "#e8b923",
+    pink: "#d94f8c",
+    teal: "#2aa8a0",
   };
 
   return (
