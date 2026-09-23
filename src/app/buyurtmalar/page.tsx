@@ -75,7 +75,16 @@ function OrdersInner() {
                   })}
                 </ul>
                 <p className="mt-3 font-display text-lg font-bold text-brand">
-                  {formatPrice(o.total)}
+                  {formatPrice(
+                    o.paymentMethod === "nasiya" && o.nasiyaPlan
+                      ? o.nasiyaPlan.totalPayable
+                      : o.total,
+                  )}
+                </p>
+                <p className="mt-1 text-xs text-muted">
+                  {o.paymentMethod === "nasiya" && o.nasiyaPlan
+                    ? `Nasiya: bosh ${formatPrice(o.nasiyaPlan.downPayment)} · oyiga ${formatPrice(o.nasiyaPlan.monthlyWithFee)} × ${o.nasiyaPlan.months}`
+                    : "To‘liq to‘lov"}
                 </p>
               </li>
             ))}

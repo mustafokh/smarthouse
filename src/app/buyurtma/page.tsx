@@ -1,8 +1,8 @@
 "use client";
 
 import Link from "next/link";
-import { FormEvent, useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
+import { FormEvent, Suspense, useEffect, useState } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 import { formatPrice } from "@/data/products";
 import { DELIVERY, OWNER_PHONE } from "@/data/contact";
 import { PaymentMethodChoice } from "@/components/PaymentMethodChoice";
@@ -12,8 +12,21 @@ import { isNasiyaEligible, type PaymentMethod } from "@/lib/nasiya";
 import { useStore } from "@/lib/store";
 
 export default function CheckoutPage() {
+  return (
+    <Suspense
+      fallback={
+        <div className="px-4 py-20 text-center text-muted">Yuklanmoqda…</div>
+      }
+    >
+      <CheckoutInner />
+    </Suspense>
+  );
+}
+
+function CheckoutInner() {
   const { cart, cartTotal, commitOrder } = useStore();
   const router = useRouter();
+  const params = useSearchParams();
   const [name, setName] = useState("");
   const [phone, setPhone] = useState("");
   const [address, setAddress] = useState("");
@@ -21,6 +34,15 @@ export default function CheckoutPage() {
   const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>("full");
   const [error, setError] = useState("");
   const [submitting, setSubmitting] = useState(false);
+
+  useEffect(() => {
+    const fromUrl = params.get("tolov");
+    if (fromUrl === "nasiya" && isNasiyaEligible(cartTotal)) {
+      setPaymentMethod("nasiya");
+    } else if (fromUrl === "full") {
+      setPaymentMethod("full");
+    }
+  }, [params, cartTotal]);
 
   useEffect(() => {
     if (!isNasiyaEligible(cartTotal) && paymentMethod === "nasiya") {
