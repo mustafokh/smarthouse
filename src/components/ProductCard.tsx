@@ -24,15 +24,15 @@ export function ProductCard({ product }: { product: Product }) {
   const rating = ratingFor(product.id);
 
   return (
-    <article className="group relative flex flex-col overflow-hidden rounded-[1.6rem] bg-white shadow-[0_12px_36px_-16px_rgba(15,23,42,0.16)] transition duration-300 hover:-translate-y-1 hover:shadow-[0_18px_44px_-16px_rgba(59,130,246,0.28)]">
-      <div className="absolute left-3 top-3 z-10 flex items-center gap-1 rounded-full bg-white/95 px-2 py-1 text-[11px] font-semibold text-slate-700 shadow-sm">
+    <article className="group relative flex flex-col overflow-hidden rounded-2xl bg-white shadow-[0_12px_36px_-16px_rgba(15,23,42,0.16)] transition duration-300 hover:-translate-y-1 hover:shadow-[0_18px_44px_-16px_rgba(59,130,246,0.28)] sm:rounded-[1.6rem]">
+      <div className="absolute left-2 top-2 z-10 flex items-center gap-1 rounded-full bg-white/95 px-1.5 py-0.5 text-[10px] font-semibold text-slate-700 shadow-sm sm:left-3 sm:top-3 sm:px-2 sm:py-1 sm:text-[11px]">
         <StarIcon />
         {rating}
       </div>
       <button
         type="button"
         onClick={() => toggleWishlist(product.id)}
-        className={`absolute right-3 top-3 z-10 flex h-9 w-9 items-center justify-center rounded-full bg-white/95 shadow-sm transition ${
+        className={`absolute right-2 top-2 z-10 flex h-8 w-8 items-center justify-center rounded-full bg-white/95 shadow-sm transition sm:right-3 sm:top-3 sm:h-9 sm:w-9 ${
           wish ? "text-rose-500" : "text-slate-400 hover:text-rose-400"
         }`}
         aria-label="Sevimlilarga"
@@ -42,31 +42,31 @@ export function ProductCard({ product }: { product: Product }) {
 
       <Link
         href={`/mahsulot/${product.slug}`}
-        className="relative mx-3 mt-10 block aspect-square"
+        className="relative mx-2 mt-8 block aspect-square sm:mx-3 sm:mt-10"
       >
         <Image
           src={product.image}
           alt={product.nameUz}
           fill
-          className="object-contain p-3 transition duration-500 group-hover:scale-[1.04]"
+          className="object-contain p-2 transition duration-500 group-hover:scale-[1.04] sm:p-3"
           sizes="(max-width:768px) 50vw, 25vw"
         />
       </Link>
 
-      <div className="flex flex-1 flex-col gap-1 px-4 pb-4 pt-1">
+      <div className="flex flex-1 flex-col gap-1 px-2.5 pb-3 pt-1 sm:px-4 sm:pb-4">
         <Link href={`/mahsulot/${product.slug}`}>
-          <h3 className="line-clamp-2 min-h-[2.5rem] font-display text-[15px] font-semibold leading-snug text-slate-800">
+          <h3 className="line-clamp-2 min-h-[2.4rem] font-display text-[13px] font-semibold leading-snug text-slate-800 sm:min-h-[2.5rem] sm:text-[15px]">
             {product.nameUz}
           </h3>
         </Link>
-        <div className="mt-2 flex items-end justify-between gap-2">
-          <p className="font-display text-lg font-bold text-slate-900">
+        <div className="mt-1.5 flex items-end justify-between gap-1.5 sm:mt-2 sm:gap-2">
+          <p className="font-display text-base font-bold text-slate-900 sm:text-lg">
             {formatPrice(product.price)}
           </p>
           <button
             type="button"
             onClick={() => addToCart(product.id, defaultColor)}
-            className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-accent text-lg font-bold text-white shadow-lg shadow-blue-500/30 transition hover:bg-accent-soft hover:scale-105"
+            className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-accent text-lg font-bold text-white shadow-lg shadow-blue-500/30 transition hover:bg-accent-soft hover:scale-105 sm:h-10 sm:w-10"
             aria-label="Savatga"
           >
             +

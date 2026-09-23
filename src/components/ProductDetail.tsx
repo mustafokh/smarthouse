@@ -78,7 +78,7 @@ export function ProductDetail({ product }: { product: Product }) {
                 <p className="text-xs font-semibold uppercase tracking-[0.16em] text-accent">
                   {product.code} · {product.protocol}
                 </p>
-                <h1 className="mt-2 font-display text-3xl font-bold text-slate-900 sm:text-4xl">
+                <h1 className="mt-2 font-display text-2xl font-bold text-slate-900 sm:text-4xl">
                   {product.nameUz}
                 </h1>
               </div>
@@ -99,7 +99,7 @@ export function ProductDetail({ product }: { product: Product }) {
             </p>
 
             <div className="mt-6 flex flex-wrap items-end gap-4">
-              <p className="font-display text-4xl font-extrabold text-slate-900">
+              <p className="font-display text-3xl font-extrabold text-slate-900 sm:text-4xl">
                 {formatPrice(product.price)}
               </p>
               <span className="rounded-full bg-amber-50 px-3 py-1 text-xs font-semibold text-amber-600">

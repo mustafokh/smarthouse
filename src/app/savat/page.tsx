@@ -70,35 +70,37 @@ export default function CartPage() {
                 return (
                   <li
                     key={`${item.productId}-${item.color}`}
-                    className="flex flex-col gap-4 rounded-2xl border border-line bg-white p-4 sm:flex-row sm:items-center"
+                    className="flex flex-col gap-3 rounded-2xl border border-line bg-white p-3 sm:flex-row sm:items-center sm:gap-4 sm:p-4"
                   >
-                    <div className="relative h-24 w-24 shrink-0 overflow-hidden rounded-xl bg-mist">
-                      <Image
-                        src={thumb}
-                        alt={p.nameUz}
-                        fill
-                        className="object-contain p-2"
-                      />
-                    </div>
-                    <div className="flex-1">
-                      <Link
-                        href={`/mahsulot/${p.slug}`}
-                        className="font-display font-semibold text-brand hover:text-cyan"
-                      >
-                        {p.nameUz}
-                      </Link>
-                      <p className="text-xs text-muted">
-                        {p.code} · {colorLabels[item.color]}
-                      </p>
-                      <p className="mt-1 font-semibold">
-                        {formatPrice(p.price)}
-                      </p>
-                    </div>
                     <div className="flex items-center gap-3">
+                      <div className="relative h-20 w-20 shrink-0 overflow-hidden rounded-xl bg-mist sm:h-24 sm:w-24">
+                        <Image
+                          src={thumb}
+                          alt={p.nameUz}
+                          fill
+                          className="object-contain p-2"
+                        />
+                      </div>
+                      <div className="min-w-0 flex-1">
+                        <Link
+                          href={`/mahsulot/${p.slug}`}
+                          className="font-display text-sm font-semibold text-brand hover:text-cyan sm:text-base"
+                        >
+                          {p.nameUz}
+                        </Link>
+                        <p className="text-xs text-muted">
+                          {p.code} · {colorLabels[item.color]}
+                        </p>
+                        <p className="mt-1 text-sm font-semibold">
+                          {formatPrice(p.price)}
+                        </p>
+                      </div>
+                    </div>
+                    <div className="flex flex-wrap items-center justify-between gap-2 sm:justify-end sm:gap-3">
                       <div className="inline-flex items-center rounded-lg border border-line">
                         <button
                           type="button"
-                          className="px-3 py-1.5 font-bold"
+                          className="min-h-10 min-w-10 px-3 py-1.5 font-bold"
                           onClick={() =>
                             updateQty(item.productId, item.color, item.qty - 1)
                           }
@@ -110,7 +112,7 @@ export default function CartPage() {
                         </span>
                         <button
                           type="button"
-                          className="px-3 py-1.5 font-bold"
+                          className="min-h-10 min-w-10 px-3 py-1.5 font-bold"
                           onClick={() =>
                             updateQty(item.productId, item.color, item.qty + 1)
                           }
@@ -126,7 +128,7 @@ export default function CartPage() {
                         onClick={() =>
                           removeFromCart(item.productId, item.color)
                         }
-                        className="text-sm text-muted hover:text-red-600"
+                        className="min-h-10 text-sm text-muted hover:text-red-600"
                       >
                         O‘chirish
                       </button>

@@ -33,8 +33,8 @@ export function HeroProductCarousel() {
   }, []);
 
   return (
-    <div className="relative h-40 w-40 shrink-0 sm:h-52 sm:w-52">
-      <div className="absolute inset-0 overflow-hidden rounded-[1.75rem] bg-white/95 shadow-[0_16px_40px_-12px_rgba(15,23,42,0.35)] ring-1 ring-white/50">
+    <div className="relative h-36 w-36 shrink-0 sm:h-52 sm:w-52">
+      <div className="absolute inset-0 overflow-hidden rounded-[1.5rem] bg-white/95 shadow-[0_16px_40px_-12px_rgba(15,23,42,0.35)] ring-1 ring-white/50 sm:rounded-[1.75rem]">
         {SLIDES.map((slide, i) => (
           <div
             key={slide.src}
@@ -46,8 +46,8 @@ export function HeroProductCarousel() {
               src={slide.src}
               alt={slide.label}
               fill
-              className="object-contain p-4 sm:p-5"
-              sizes="208px"
+              className="object-contain p-3 sm:p-5"
+              sizes="(max-width:640px) 144px, 208px"
               priority={i === 0}
             />
           </div>

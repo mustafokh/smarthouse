@@ -23,20 +23,20 @@ export function Header() {
   const [open, setOpen] = useState(false);
 
   return (
-    <header className="sticky top-0 z-50 border-b border-white/60 bg-white/80 backdrop-blur-xl">
-      <div className="mx-auto flex h-[4.25rem] max-w-6xl items-center justify-between gap-4 px-4 sm:px-6">
-        <Link href="/" className="flex items-center gap-2.5 shrink-0">
-          <span className="flex h-10 w-10 items-center justify-center overflow-hidden rounded-2xl bg-accent-tint shadow-sm">
+    <header className="sticky top-0 z-50 border-b border-white/60 bg-white/80 pt-[env(safe-area-inset-top)] backdrop-blur-xl">
+      <div className="mx-auto flex h-14 max-w-6xl items-center justify-between gap-2 px-3 sm:h-[4.25rem] sm:gap-4 sm:px-6">
+        <Link href="/" className="flex min-w-0 items-center gap-2 shrink-0 sm:gap-2.5">
+          <span className="flex h-9 w-9 shrink-0 items-center justify-center overflow-hidden rounded-xl bg-accent-tint shadow-sm sm:h-10 sm:w-10 sm:rounded-2xl">
             <Image
               src="/logo-mark.png"
               alt="smart.house777"
               width={36}
               height={36}
-              className="h-8 w-8 object-contain"
+              className="h-7 w-7 object-contain sm:h-8 sm:w-8"
               priority
             />
           </span>
-          <span className="font-display text-[1.05rem] font-bold tracking-tight text-slate-900">
+          <span className="hidden font-display text-[1.05rem] font-bold tracking-tight text-slate-900 min-[360px]:inline">
             smart.house<span className="text-accent">777</span>
           </span>
         </Link>
@@ -61,7 +61,7 @@ export function Header() {
           })}
         </nav>
 
-        <div className="flex items-center gap-1.5 sm:gap-2">
+        <div className="flex shrink-0 items-center gap-1 sm:gap-2">
           <LangSwitch lang={lang} setLang={setLang} t={t} />
           <a
             href={OWNER_PHONE.telHref}
@@ -71,7 +71,7 @@ export function Header() {
           </a>
           <Link
             href="/sevimlilar"
-            className="relative flex h-10 w-10 items-center justify-center rounded-full text-slate-500 hover:bg-slate-100"
+            className="relative hidden h-10 w-10 items-center justify-center rounded-full text-slate-500 hover:bg-slate-100 sm:flex"
             aria-label="Sevimlilar"
           >
             <HeartIcon />
@@ -83,7 +83,7 @@ export function Header() {
           </Link>
           <Link
             href="/savat"
-            className="relative flex h-10 w-10 items-center justify-center rounded-full bg-accent text-white shadow-md shadow-blue-500/25"
+            className="relative flex h-9 w-9 items-center justify-center rounded-full bg-accent text-white shadow-md shadow-blue-500/25 sm:h-10 sm:w-10"
             aria-label="Savat"
           >
             <CartIcon />
@@ -95,9 +95,10 @@ export function Header() {
           </Link>
           <button
             type="button"
-            className="flex h-10 w-10 items-center justify-center rounded-full text-slate-600 hover:bg-slate-100 lg:hidden"
+            className="flex h-9 w-9 items-center justify-center rounded-full text-slate-600 hover:bg-slate-100 sm:h-10 sm:w-10 lg:hidden"
             onClick={() => setOpen((v) => !v)}
             aria-label="Menyu"
+            aria-expanded={open}
           >
             <MenuIcon open={open} />
           </button>
@@ -105,25 +106,40 @@ export function Header() {
       </div>
 
       {open && (
-        <div className="border-t border-line bg-white px-4 py-3 lg:hidden">
+        <div className="border-t border-line bg-white px-3 py-3 sm:px-4 lg:hidden">
           <nav className="flex flex-col gap-1">
             {linkDefs.map((l) => (
               <Link
                 key={l.href}
                 href={l.href}
                 onClick={() => setOpen(false)}
-                className="rounded-xl px-3 py-2.5 text-sm font-medium text-slate-700 hover:bg-accent-tint"
+                className="rounded-xl px-3 py-3 text-sm font-medium text-slate-700 hover:bg-accent-tint"
               >
                 {t(l.key)}
               </Link>
             ))}
             <Link
+              href="/sevimlilar"
+              onClick={() => setOpen(false)}
+              className="rounded-xl px-3 py-3 text-sm font-medium text-slate-700 hover:bg-accent-tint sm:hidden"
+            >
+              Sevimlilar
+              {wishlist.length > 0 ? ` (${wishlist.length})` : ""}
+            </Link>
+            <Link
               href="/buyurtmalar"
               onClick={() => setOpen(false)}
-              className="rounded-xl px-3 py-2.5 text-sm font-medium text-slate-700 hover:bg-accent-tint"
+              className="rounded-xl px-3 py-3 text-sm font-medium text-slate-700 hover:bg-accent-tint"
             >
               {t("nav_orders")}
             </Link>
+            <a
+              href={OWNER_PHONE.telHref}
+              onClick={() => setOpen(false)}
+              className="rounded-xl px-3 py-3 text-sm font-semibold text-accent hover:bg-accent-tint md:hidden"
+            >
+              {OWNER_PHONE.display}
+            </a>
           </nav>
         </div>
       )}
@@ -277,11 +293,11 @@ function LangSwitch({
   t: (k: string) => string;
 }) {
   return (
-    <div className="flex items-center rounded-full bg-slate-100 p-0.5 text-xs font-bold">
+    <div className="flex items-center rounded-full bg-slate-100 p-0.5 text-[11px] font-bold sm:text-xs">
       <button
         type="button"
         onClick={() => setLang("uz")}
-        className={`rounded-full px-2.5 py-1.5 transition ${
+        className={`rounded-full px-2 py-1.5 transition sm:px-2.5 ${
           lang === "uz" ? "bg-white text-accent shadow-sm" : "text-slate-500"
         }`}
       >
@@ -290,7 +306,7 @@ function LangSwitch({
       <button
         type="button"
         onClick={() => setLang("ru")}
-        className={`rounded-full px-2.5 py-1.5 transition ${
+        className={`rounded-full px-2 py-1.5 transition sm:px-2.5 ${
           lang === "ru" ? "bg-white text-accent shadow-sm" : "text-slate-500"
         }`}
       >

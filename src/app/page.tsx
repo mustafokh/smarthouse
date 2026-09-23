@@ -14,17 +14,17 @@ export default function HomePage() {
   return (
     <div className="soft-page">
       <div className="mx-auto max-w-6xl px-4 pb-16 pt-6 sm:px-6">
-        <section className="promo-banner animate-rise relative overflow-hidden rounded-[1.75rem] px-6 py-8 text-white shadow-[0_20px_50px_-20px_rgba(37,99,235,0.55)] sm:px-10 sm:py-10">
+        <section className="promo-banner animate-rise relative overflow-hidden rounded-[1.5rem] px-4 py-6 text-white shadow-[0_20px_50px_-20px_rgba(37,99,235,0.55)] sm:rounded-[1.75rem] sm:px-10 sm:py-10">
           <div
             className="pointer-events-none absolute -right-6 top-1/2 h-40 w-40 -translate-y-1/2 rounded-full bg-white/15 blur-2xl sm:h-56 sm:w-56"
             aria-hidden
           />
-          <div className="relative flex flex-col items-start justify-between gap-8 sm:flex-row sm:items-center">
+          <div className="relative flex flex-col items-center gap-6 text-center sm:flex-row sm:items-center sm:justify-between sm:gap-8 sm:text-left">
             <div className="max-w-md">
-              <p className="text-xs font-semibold uppercase tracking-[0.2em] text-white/80">
+              <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-white/80 sm:text-xs">
                 {t("hero_eyebrow")}
               </p>
-              <h1 className="mt-2 font-display text-3xl font-extrabold leading-tight sm:text-4xl">
+              <h1 className="mt-2 font-display text-[1.65rem] font-extrabold leading-tight sm:text-4xl">
                 {t("hero_title_1")}
                 <span className="block">{t("hero_title_2")}</span>
               </h1>
@@ -33,12 +33,12 @@ export default function HomePage() {
               </p>
               <Link
                 href="/katalog"
-                className="mt-6 inline-flex rounded-full bg-white px-6 py-3 text-sm font-bold text-accent shadow-lg transition hover:bg-slate-50"
+                className="mt-5 inline-flex rounded-full bg-white px-5 py-3 text-sm font-bold text-accent shadow-lg transition hover:bg-slate-50 sm:mt-6 sm:px-6"
               >
                 {t("hero_cta")}
               </Link>
             </div>
-            <div className="animate-float">
+            <div className="animate-float shrink-0">
               <HeroProductCarousel />
             </div>
           </div>

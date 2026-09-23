@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Manrope, Outfit } from "next/font/google";
 import { StoreProvider } from "@/lib/store";
 import { I18nProvider } from "@/lib/i18n";
@@ -17,6 +17,16 @@ const manrope = Manrope({
   weight: ["400", "500", "600", "700"],
 });
 
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+  viewportFit: "cover",
+  themeColor: [
+    { media: "(prefers-color-scheme: light)", color: "#3b82f6" },
+    { media: "(prefers-color-scheme: dark)", color: "#1e293b" },
+  ],
+};
+
 export const metadata: Metadata = {
   title: {
     default: "smart.house777 — Smart uy katalogi",
@@ -33,9 +43,19 @@ export const metadata: Metadata = {
     "viklyuchatel",
     "O‘zbekiston",
   ],
+  applicationName: "smart.house777",
+  appleWebApp: {
+    title: "smart.house777",
+    capable: true,
+    statusBarStyle: "default",
+  },
   icons: {
-    icon: [{ url: "/favicon.png", type: "image/png" }],
-    apple: [{ url: "/apple-touch-icon.png" }],
+    icon: [
+      { url: "/favicon.ico", sizes: "any" },
+      { url: "/favicon.png", type: "image/png", sizes: "32x32" },
+      { url: "/icon-512.png", type: "image/png", sizes: "512x512" },
+    ],
+    apple: [{ url: "/apple-touch-icon.png", sizes: "180x180" }],
   },
 };
 
