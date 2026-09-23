@@ -83,7 +83,16 @@ function OrdersInner() {
                 </p>
                 <p className="mt-1 text-xs text-muted">
                   {o.paymentMethod === "nasiya" && o.nasiyaPlan
-                    ? `Nasiya: bosh ${formatPrice(o.nasiyaPlan.downPayment)} · oyiga ${formatPrice(o.nasiyaPlan.monthlyWithFee)} × ${o.nasiyaPlan.months}`
+                    ? `Nasiya: bosh ${formatPrice(o.nasiyaPlan.downPayment)}${
+                        o.nasiyaPlan.monthPayments?.length
+                          ? o.nasiyaPlan.monthPayments
+                              .map(
+                                (a, i) =>
+                                  ` · ${i + 1}-oy ${formatPrice(a)}`,
+                              )
+                              .join("")
+                          : ` · oyiga ${formatPrice(o.nasiyaPlan.monthlyWithFee)} × ${o.nasiyaPlan.months}`
+                      }`
                     : "To‘liq to‘lov"}
                   {" · "}
                   {o.needsInstall

@@ -74,20 +74,18 @@ export function PaymentMethodChoice({
           }`}
         >
           <Row
-            label="Bosh to‘lov (50%)"
+            label="Bosh to‘lov (1-to‘lov, 50%)"
             value={formatPrice(plan.downPayment)}
             dark={dark}
           />
-          <Row
-            label={`Oyiga (+10%, ${plan.months} oy)`}
-            value={formatPrice(plan.monthlyWithFee)}
-            dark={dark}
-          />
-          <Row
-            label="Qolgan asos"
-            value={formatPrice(plan.remainingBase)}
-            dark={dark}
-          />
+          {plan.monthPayments.map((amount, i) => (
+            <Row
+              key={i}
+              label={`${i + 1}-oy (+10% nasiya)`}
+              value={formatPrice(amount)}
+              dark={dark}
+            />
+          ))}
           <div
             className={`flex justify-between border-t pt-2 font-display font-bold ${
               dark ? "border-white/15 text-cyan" : "border-cyan/25 text-brand"

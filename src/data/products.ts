@@ -631,7 +631,9 @@ export function getFeaturedProducts(): Product[] {
 }
 
 export function formatPrice(price: number): string {
-  return `${price}$`;
+  const rounded = Math.round((price + Number.EPSILON) * 100) / 100;
+  if (Number.isInteger(rounded)) return `${rounded}$`;
+  return `${rounded.toFixed(2)}$`;
 }
 
 export function searchProducts(query: string): Product[] {
