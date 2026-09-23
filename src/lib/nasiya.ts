@@ -2,7 +2,8 @@
 
 export const NASIYA_MIN_AMOUNT = 100;
 export const NASIYA_DOWN_PAYMENT_PERCENT = 0.5;
-export const NASIYA_MONTHLY_MARKUP = 0.1;
+/** Har oy uchun +10% (1 oy → +10%, 2 oy → +20%, 3 oy → +30%) */
+export const NASIYA_MARKUP_PER_MONTH = 0.1;
 export const NASIYA_MONTH_OPTIONS = [1, 2, 3] as const;
 
 export type NasiyaMonths = (typeof NASIYA_MONTH_OPTIONS)[number];
@@ -12,11 +13,14 @@ export interface NasiyaPlan {
   downPayment: number;
   monthlyBase: number;
   monthlyWithFee: number;
-  /** Har oy to‘lovi (+10%), oy soniga qarab */
+  /** Qolgan summa teng bo‘lib oylarga */
   monthPayments: number[];
   months: NasiyaMonths;
+  /** Jami: asosiy × (1 + oy × 10%) */
   totalPayable: number;
   remainingBase: number;
+  /** Masalan 0.3 = +30% (eski buyurtmalarda bo‘lmasligi mumkin) */
+  markupPercent?: number;
 }
 
 export interface NasiyaCalc extends NasiyaPlan {
@@ -36,18 +40,23 @@ export function normalizeNasiyaMonths(months?: number): NasiyaMonths {
   return 3;
 }
 
+export function nasiyaMarkupRate(months: NasiyaMonths): number {
+  return months * NASIYA_MARKUP_PER_MONTH;
+}
+
 /**
- * 50% bosh to‘lov + qolgan summa N oyga bo‘linadi, har oyga +10% nasiya.
- * months: 1 | 2 | 3
+ * 50% bosh to‘lov (tovar narxidan) + jami narxga oy × 10% ustama.
  *
- * $120, 3 oy: bosh 60$; oyiga 22$ × 3 → jami 126$
- * $120, 1 oy: bosh 60$; 1-oy 66$ → jami 126$
+ * $100, 1 oy → jami 110$
+ * $100, 2 oy → jami 120$
+ * $100, 3 oy → jami 130$
  */
 export function calcNasiya(
   total: number,
   monthsInput: number = 3,
 ): NasiyaCalc {
   const months = normalizeNasiyaMonths(monthsInput);
+  const markupPercent = nasiyaMarkupRate(months);
 
   if (!isNasiyaEligible(total)) {
     return {
@@ -59,13 +68,14 @@ export function calcNasiya(
       months,
       totalPayable: moneyRound(total),
       remainingBase: 0,
+      markupPercent,
     };
   }
 
+  const totalPayable = moneyRound(total * (1 + markupPercent));
   const downPayment = moneyRound(total * NASIYA_DOWN_PAYMENT_PERCENT);
-  const remainingBase = moneyRound(total - downPayment);
-  const monthlyBase = remainingBase / months;
-  const rawMonthly = monthlyBase * (1 + NASIYA_MONTHLY_MARKUP);
+  const remaining = moneyRound(totalPayable - downPayment);
+  const rawMonthly = remaining / months;
 
   const monthPayments: number[] = [];
   let paid = 0;
@@ -74,23 +84,20 @@ export function calcNasiya(
     monthPayments.push(m);
     paid += m;
   }
-  const monthsTotalTarget = moneyRound(rawMonthly * months);
-  monthPayments.push(moneyRound(monthsTotalTarget - paid));
+  monthPayments.push(moneyRound(remaining - paid));
 
   const monthlyWithFee = monthPayments[0] ?? moneyRound(rawMonthly);
-  const totalPayable = moneyRound(
-    downPayment + monthPayments.reduce((a, b) => a + b, 0),
-  );
 
   return {
     eligible: true,
     downPayment,
-    monthlyBase: moneyRound(monthlyBase),
+    monthlyBase: moneyRound(rawMonthly),
     monthlyWithFee,
     monthPayments,
     months,
     totalPayable,
-    remainingBase,
+    remainingBase: remaining,
+    markupPercent,
   };
 }
 
@@ -104,5 +111,6 @@ export function toNasiyaPlan(calc: NasiyaCalc): NasiyaPlan | undefined {
     months: calc.months,
     totalPayable: calc.totalPayable,
     remainingBase: calc.remainingBase,
+    markupPercent: calc.markupPercent,
   };
 }

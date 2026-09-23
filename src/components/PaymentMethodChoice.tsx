@@ -4,6 +4,7 @@ import { formatPrice } from "@/data/products";
 import {
   calcNasiya,
   isNasiyaEligible,
+  moneyRound,
   NASIYA_MIN_AMOUNT,
   NASIYA_MONTH_OPTIONS,
   type NasiyaMonths,
@@ -102,7 +103,7 @@ export function PaymentMethodChoice({
                   >
                     <span className="block text-sm font-bold">{m} oy</span>
                     <span className="mt-0.5 block text-[10px] opacity-80">
-                      jami {formatPrice(preview.totalPayable)}
+                      +{m * 10}% · {formatPrice(preview.totalPayable)}
                     </span>
                   </button>
                 );
@@ -118,6 +119,11 @@ export function PaymentMethodChoice({
             }`}
           >
             <Row
+              label={`Ustama (+${Math.round((plan.markupPercent ?? nasiyaMonths * 0.1) * 100)}%)`}
+              value={formatPrice(moneyRound(plan.totalPayable - total))}
+              dark={dark}
+            />
+            <Row
               label="Bosh to‘lov (50%)"
               value={formatPrice(plan.downPayment)}
               dark={dark}
@@ -125,7 +131,7 @@ export function PaymentMethodChoice({
             {plan.monthPayments.map((amount, i) => (
               <Row
                 key={i}
-                label={`${i + 1}-oy (+10%)`}
+                label={`${i + 1}-oy`}
                 value={formatPrice(amount)}
                 dark={dark}
               />
