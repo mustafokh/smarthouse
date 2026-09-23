@@ -1,13 +1,15 @@
 "use client";
 
 import Link from "next/link";
-import { FormEvent, useState } from "react";
+import { FormEvent, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { formatPrice } from "@/data/products";
 import { DELIVERY, OWNER_PHONE } from "@/data/contact";
-import { createOrderRecord } from "@/lib/order";
-import { useStore } from "@/lib/store";
+import { PaymentMethodChoice } from "@/components/PaymentMethodChoice";
 import { SectionHeading } from "@/components/ProductCard";
+import { createOrderRecord } from "@/lib/order";
+import { isNasiyaEligible, type PaymentMethod } from "@/lib/nasiya";
+import { useStore } from "@/lib/store";
 
 export default function CheckoutPage() {
   const { cart, cartTotal, commitOrder } = useStore();
@@ -16,8 +18,15 @@ export default function CheckoutPage() {
   const [phone, setPhone] = useState("");
   const [address, setAddress] = useState("");
   const [note, setNote] = useState("");
+  const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>("full");
   const [error, setError] = useState("");
   const [submitting, setSubmitting] = useState(false);
+
+  useEffect(() => {
+    if (!isNasiyaEligible(cartTotal) && paymentMethod === "nasiya") {
+      setPaymentMethod("full");
+    }
+  }, [cartTotal, paymentMethod]);
 
   if (cart.length === 0) {
     return (
@@ -43,7 +52,11 @@ export default function CheckoutPage() {
     setError("");
     setSubmitting(true);
 
-    const order = createOrderRecord(cart, { name, phone, address, note });
+    const order = createOrderRecord(
+      cart,
+      { name, phone, address, note },
+      paymentMethod,
+    );
 
     try {
       const response = await fetch("/api/telegram/order", {
@@ -56,7 +69,9 @@ export default function CheckoutPage() {
         const data = (await response.json().catch(() => null)) as {
           error?: string;
         } | null;
-        setError(data?.error ?? "Buyurtmani yuborishda xatolik. Qayta urinib ko‘ring.");
+        setError(
+          data?.error ?? "Buyurtmani yuborishda xatolik. Qayta urinib ko‘ring.",
+        );
         setSubmitting(false);
         return;
       }
@@ -83,11 +98,7 @@ export default function CheckoutPage() {
           className="mt-8 space-y-4 rounded-2xl border border-line bg-white p-6 shadow-sm"
         >
           <Field label="Ism familiya *" value={name} onChange={setName} />
-          <Field
-            label="Telefon *"
-            value={phone}
-            onChange={setPhone}
-          />
+          <Field label="Telefon *" value={phone} onChange={setPhone} />
           <Field
             label="Manzil"
             value={address}
@@ -103,6 +114,14 @@ export default function CheckoutPage() {
               className="mt-1.5 w-full rounded-xl border border-line bg-fog px-3 py-2.5 text-sm outline-none focus:ring-2 focus:ring-cyan/40"
             />
           </label>
+
+          <PaymentMethodChoice
+            total={cartTotal}
+            value={paymentMethod}
+            onChange={setPaymentMethod}
+            variant="light"
+          />
+
           <p className="rounded-xl bg-cyan/10 px-3 py-2 text-xs text-brand">
             {DELIVERY.tashkentFree}
           </p>

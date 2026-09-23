@@ -2,17 +2,33 @@
 
 import Image from "next/image";
 import Link from "next/link";
+import { useEffect, useState } from "react";
 import {
   colorLabels,
   formatPrice,
   getProductByCode,
 } from "@/data/products";
 import { DELIVERY } from "@/data/contact";
-import { useStore } from "@/lib/store";
+import { PaymentMethodChoice } from "@/components/PaymentMethodChoice";
 import { SectionHeading } from "@/components/ProductCard";
+import { calcNasiya, isNasiyaEligible, type PaymentMethod } from "@/lib/nasiya";
+import { useStore } from "@/lib/store";
 
 export default function CartPage() {
   const { cart, cartTotal, updateQty, removeFromCart, cartCount } = useStore();
+  const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>("full");
+
+  useEffect(() => {
+    if (!isNasiyaEligible(cartTotal) && paymentMethod === "nasiya") {
+      setPaymentMethod("full");
+    }
+  }, [cartTotal, paymentMethod]);
+
+  const nasiya = calcNasiya(cartTotal);
+  const displayTotal =
+    paymentMethod === "nasiya" && nasiya.eligible
+      ? nasiya.totalPayable
+      : cartTotal;
 
   return (
     <div className="bg-circuit min-h-screen">
@@ -21,9 +37,7 @@ export default function CartPage() {
           eyebrow="Savat"
           title="Sizning savatingiz"
           subtitle={
-            cartCount
-              ? `${cartCount} ta mahsulot`
-              : "Savat hozircha bo‘sh"
+            cartCount ? `${cartCount} ta mahsulot` : "Savat hozircha bo‘sh"
           }
         />
 
@@ -43,6 +57,8 @@ export default function CartPage() {
               {cart.map((item) => {
                 const p = getProductByCode(item.productId);
                 if (!p) return null;
+                const thumb =
+                  p.imagesByColor?.[item.color] ?? p.image;
                 return (
                   <li
                     key={`${item.productId}-${item.color}`}
@@ -50,7 +66,7 @@ export default function CartPage() {
                   >
                     <div className="relative h-24 w-24 shrink-0 overflow-hidden rounded-xl bg-mist">
                       <Image
-                        src={p.image}
+                        src={thumb}
                         alt={p.nameUz}
                         fill
                         className="object-contain p-2"
@@ -112,9 +128,9 @@ export default function CartPage() {
               })}
             </ul>
 
-            <aside className="h-fit rounded-2xl border border-line bg-brand p-6 text-white">
+            <aside className="h-fit space-y-4 rounded-2xl border border-line bg-brand p-6 text-white">
               <h2 className="font-display text-lg font-bold">Jami</h2>
-              <dl className="mt-4 space-y-2 text-sm">
+              <dl className="space-y-2 text-sm">
                 <div className="flex justify-between text-white/80">
                   <dt>Mahsulotlar</dt>
                   <dd>{formatPrice(cartTotal)}</dd>
@@ -125,12 +141,20 @@ export default function CartPage() {
                 </div>
                 <div className="flex justify-between border-t border-white/15 pt-3 font-display text-xl font-bold">
                   <dt>Jami</dt>
-                  <dd className="text-cyan">{formatPrice(cartTotal)}</dd>
+                  <dd className="text-cyan">{formatPrice(displayTotal)}</dd>
                 </div>
               </dl>
+
+              <PaymentMethodChoice
+                total={cartTotal}
+                value={paymentMethod}
+                onChange={setPaymentMethod}
+                variant="dark"
+              />
+
               <Link
-                href="/buyurtma"
-                className="mt-6 block rounded-xl bg-cyan py-3.5 text-center text-sm font-bold text-brand hover:bg-cyan-soft"
+                href={`/buyurtma?tolov=${paymentMethod}`}
+                className="mt-2 block rounded-xl bg-cyan py-3.5 text-center text-sm font-bold text-brand hover:bg-cyan-soft"
               >
                 Buyurtmani rasmiylashtirish
               </Link>
