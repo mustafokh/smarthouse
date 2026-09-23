@@ -397,6 +397,11 @@ function parseColorToken(raw: string): string | null {
     moviy: "teal",
     green: "green",
     yashil: "green",
+    orange: "orange",
+    "to'q sariq": "orange",
+    toqsariq: "orange",
+    purple: "purple",
+    binafsha: "purple",
   };
   return map[raw.toLowerCase()] ?? null;
 }

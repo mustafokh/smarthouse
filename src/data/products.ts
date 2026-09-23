@@ -7,7 +7,9 @@ export type ProductColor =
   | "yellow"
   | "pink"
   | "teal"
-  | "green";
+  | "green"
+  | "orange"
+  | "purple";
 
 export type Protocol = "wifi" | "zigbee" | "yandex";
 
@@ -48,6 +50,8 @@ export const colorLabels: Record<ProductColor, string> = {
   pink: "Pushti",
   teal: "Moviy",
   green: "Yashil",
+  orange: "To‘q sariq",
+  purple: "Binafsha",
 };
 
 export const categories: Category[] = [
@@ -613,28 +617,30 @@ export const products: Product[] = [
     slug: "yandex-stansiya-layt",
     code: "YSL-001",
     name: "Yandex Stansiya Layt",
-    nameUz: "Yandex Layt (3 soatli)",
+    nameUz: "Yandex Layt (soatsiz)",
     category: "kolonkalar",
-    price: 70,
+    price: 60,
     currency: "USD",
     protocol: "yandex",
-    colors: ["pink", "green", "teal"],
+    colors: ["pink", "green", "teal", "orange", "purple"],
     shortDescription:
-      "Yandex Layt — portativ smart kolonka, ~3 soat batareya.",
+      "Yandex Layt (soatsiz) — Alice bilan ixcham smart kolonka.",
     description:
-      "Yandex Stansiya Layt (3 soatli) — Alice ovozli yordamchi bilan ixcham smart kolonka. Portativ batareya (~3 soat), musiqa va smart uy bilan ishlaydi. Pushti, yashil va moviy ranglarda.",
+      "Yandex Stansiya Layt (soatsiz) — Alice ovozli yordamchi bilan ixcham smart kolonka. Soatsiz model, musiqa va smart uy bilan ishlaydi. Pushti, yashil, moviy, to‘q sariq va binafsha ranglarda.",
     specs: [
       "Yandex Alice",
-      "~3 soat batareya",
+      "Soatsiz",
       "Wi-Fi",
-      "Portativ",
-      "3 rang",
+      "Ixcham",
+      "5 rang",
     ],
     image: "/products/YSL-001.png",
     imagesByColor: {
       pink: "/products/YSL-001-pink.png",
       green: "/products/YSL-001-green.png",
       teal: "/products/YSL-001-teal.png",
+      orange: "/products/YSL-001-orange.png",
+      purple: "/products/YSL-001-purple.png",
     },
     featured: true,
   },

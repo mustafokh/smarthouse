@@ -114,6 +114,8 @@ const COLOR_SWATCH: Record<ProductColor, string> = {
   pink: "#d94f8c",
   teal: "#2aa8d0",
   green: "#7cb82f",
+  orange: "#f07828",
+  purple: "#8b6bc9",
 };
 
 export function ColorDots({
