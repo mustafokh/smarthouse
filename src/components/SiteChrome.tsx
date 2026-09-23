@@ -6,18 +6,20 @@ import { usePathname } from "next/navigation";
 import { useState } from "react";
 import { DELIVERY, OWNER_PHONE, TELEGRAM_URL } from "@/data/contact";
 import { useStore } from "@/lib/store";
+import { useI18n, type Lang } from "@/lib/i18n";
 
-const links = [
-  { href: "/", label: "Bosh sahifa" },
-  { href: "/katalog", label: "Katalog" },
-  { href: "/haqida", label: "Kompaniya" },
-  { href: "/yetkazib-berish", label: "Yetkazish" },
-  { href: "/aloqa", label: "Aloqa" },
-];
+const linkDefs = [
+  { href: "/", key: "nav_home" },
+  { href: "/katalog", key: "nav_catalog" },
+  { href: "/haqida", key: "nav_company" },
+  { href: "/yetkazib-berish", key: "nav_delivery" },
+  { href: "/aloqa", key: "nav_contact" },
+] as const;
 
 export function Header() {
   const pathname = usePathname();
   const { cartCount, wishlist } = useStore();
+  const { t, lang, setLang } = useI18n();
   const [open, setOpen] = useState(false);
 
   return (
@@ -40,7 +42,7 @@ export function Header() {
         </Link>
 
         <nav className="hidden items-center gap-1 lg:flex">
-          {links.map((l) => {
+          {linkDefs.map((l) => {
             const active =
               l.href === "/" ? pathname === "/" : pathname.startsWith(l.href);
             return (
@@ -53,16 +55,17 @@ export function Header() {
                     : "text-slate-500 hover:bg-slate-100 hover:text-slate-800"
                 }`}
               >
-                {l.label}
+                {t(l.key)}
               </Link>
             );
           })}
         </nav>
 
         <div className="flex items-center gap-1.5 sm:gap-2">
+          <LangSwitch lang={lang} setLang={setLang} t={t} />
           <a
             href={OWNER_PHONE.telHref}
-            className="hidden rounded-full bg-accent-tint px-3 py-2 text-xs font-semibold text-accent sm:inline"
+            className="hidden rounded-full bg-accent-tint px-3 py-2 text-xs font-semibold text-accent md:inline"
           >
             {OWNER_PHONE.display}
           </a>
@@ -104,14 +107,14 @@ export function Header() {
       {open && (
         <div className="border-t border-line bg-white px-4 py-3 lg:hidden">
           <nav className="flex flex-col gap-1">
-            {links.map((l) => (
+            {linkDefs.map((l) => (
               <Link
                 key={l.href}
                 href={l.href}
                 onClick={() => setOpen(false)}
                 className="rounded-xl px-3 py-2.5 text-sm font-medium text-slate-700 hover:bg-accent-tint"
               >
-                {l.label}
+                {t(l.key)}
               </Link>
             ))}
             <Link
@@ -119,7 +122,7 @@ export function Header() {
               onClick={() => setOpen(false)}
               className="rounded-xl px-3 py-2.5 text-sm font-medium text-slate-700 hover:bg-accent-tint"
             >
-              Buyurtmalarim
+              {t("nav_orders")}
             </Link>
           </nav>
         </div>
@@ -180,6 +183,7 @@ function MenuIcon({ open }: { open: boolean }) {
 }
 
 export function Footer() {
+  const { t } = useI18n();
   return (
     <footer className="mt-auto border-t border-line bg-white">
       <div className="mx-auto grid max-w-6xl gap-10 px-4 py-12 sm:px-6 md:grid-cols-4">
@@ -199,40 +203,39 @@ export function Footer() {
             </span>
           </Link>
           <p className="mt-3 max-w-md text-sm leading-relaxed text-muted">
-            Smart uy, Zigbee va Wi-Fi qurilmalari — professional katalog.
-            Toshkent bo‘ylab yetkazib berish bepul.
+            {t("footer_tag")}
           </p>
           <p className="mt-3 text-sm font-medium text-accent">
             {DELIVERY.tashkentFree}
           </p>
         </div>
         <div>
-          <p className="text-sm font-semibold text-slate-900">Sahifalar</p>
+          <p className="text-sm font-semibold text-slate-900">{t("pages")}</p>
           <ul className="mt-3 space-y-2 text-sm text-muted">
             <li>
               <Link href="/katalog" className="hover:text-accent">
-                Katalog
+                {t("nav_catalog")}
               </Link>
             </li>
             <li>
               <Link href="/haqida" className="hover:text-accent">
-                Kompaniya
+                {t("company")}
               </Link>
             </li>
             <li>
               <Link href="/yetkazib-berish" className="hover:text-accent">
-                Yetkazib berish
+                {t("delivery")}
               </Link>
             </li>
             <li>
               <Link href="/savol-javob" className="hover:text-accent">
-                FAQ
+                {t("faq")}
               </Link>
             </li>
           </ul>
         </div>
         <div>
-          <p className="text-sm font-semibold text-slate-900">Aloqa</p>
+          <p className="text-sm font-semibold text-slate-900">{t("contact")}</p>
           <ul className="mt-3 space-y-2 text-sm text-muted">
             <li>
               <a href={OWNER_PHONE.telHref} className="hover:text-accent">
@@ -241,7 +244,7 @@ export function Footer() {
             </li>
             <li>
               <Link href="/aloqa" className="hover:text-accent">
-                Konsultatsiya
+                {t("consult")}
               </Link>
             </li>
             <li>
@@ -261,5 +264,38 @@ export function Footer() {
         © {new Date().getFullYear()} smart.house777
       </div>
     </footer>
+  );
+}
+
+function LangSwitch({
+  lang,
+  setLang,
+  t,
+}: {
+  lang: Lang;
+  setLang: (l: Lang) => void;
+  t: (k: string) => string;
+}) {
+  return (
+    <div className="flex items-center rounded-full bg-slate-100 p-0.5 text-xs font-bold">
+      <button
+        type="button"
+        onClick={() => setLang("uz")}
+        className={`rounded-full px-2.5 py-1.5 transition ${
+          lang === "uz" ? "bg-white text-accent shadow-sm" : "text-slate-500"
+        }`}
+      >
+        {t("lang_uz")}
+      </button>
+      <button
+        type="button"
+        onClick={() => setLang("ru")}
+        className={`rounded-full px-2.5 py-1.5 transition ${
+          lang === "ru" ? "bg-white text-accent shadow-sm" : "text-slate-500"
+        }`}
+      >
+        {t("lang_ru")}
+      </button>
+    </div>
   );
 }

@@ -13,7 +13,9 @@ import type { ProductColor } from "@/data/products";
 import { getProductByCode, products } from "@/data/products";
 import {
   calcNasiya,
+  normalizeNasiyaMonths,
   toNasiyaPlan,
+  type NasiyaMonths,
   type NasiyaPlan,
   type PaymentMethod,
 } from "@/lib/nasiya";
@@ -58,6 +60,7 @@ interface StoreContextValue {
     address: string;
     note: string;
     paymentMethod?: PaymentMethod;
+    nasiyaMonths?: NasiyaMonths;
     needsInstall?: boolean;
   }) => OrderRecord;
   commitOrder: (order: OrderRecord) => void;
@@ -189,6 +192,7 @@ export function StoreProvider({ children }: { children: ReactNode }) {
       address: string;
       note: string;
       paymentMethod?: PaymentMethod;
+      nasiyaMonths?: NasiyaMonths;
       needsInstall?: boolean;
     }) => {
       const total = cart.reduce((sum, item) => {
@@ -197,7 +201,8 @@ export function StoreProvider({ children }: { children: ReactNode }) {
       }, 0);
 
       const requested = data.paymentMethod ?? "full";
-      const nasiya = calcNasiya(total);
+      const months = normalizeNasiyaMonths(data.nasiyaMonths);
+      const nasiya = calcNasiya(total, months);
       const paymentMethod: PaymentMethod =
         requested === "nasiya" && nasiya.eligible ? "nasiya" : "full";
 

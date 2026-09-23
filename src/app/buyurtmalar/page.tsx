@@ -83,7 +83,7 @@ function OrdersInner() {
                 </p>
                 <p className="mt-1 text-xs text-muted">
                   {o.paymentMethod === "nasiya" && o.nasiyaPlan
-                    ? `Nasiya: bosh ${formatPrice(o.nasiyaPlan.downPayment)}${
+                    ? `Nasiya (${o.nasiyaPlan.months} oy): bosh ${formatPrice(o.nasiyaPlan.downPayment)}${
                         o.nasiyaPlan.monthPayments?.length
                           ? o.nasiyaPlan.monthPayments
                               .map(

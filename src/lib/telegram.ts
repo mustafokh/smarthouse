@@ -50,12 +50,12 @@ export function formatOrderTelegramMessage(order: OrderRecord): string {
     method === "nasiya" && order.nasiyaPlan
       ? [
           "",
-          "<b>To‘lov — Nasiya (bo‘lib to‘lash)</b>",
+          `<b>To‘lov — Nasiya (${order.nasiyaPlan.months} oy)</b>`,
           `• Bosh to‘lov (50%): ${escapeHtml(formatPrice(order.nasiyaPlan.downPayment))}`,
           ...(order.nasiyaPlan.monthPayments?.length
             ? order.nasiyaPlan.monthPayments.map(
                 (amount, i) =>
-                  `• ${i + 1}-oy: ${escapeHtml(formatPrice(amount))}`,
+                  `• ${i + 1}-oy (+10%): ${escapeHtml(formatPrice(amount))}`,
               )
             : [
                 `• Oyiga (+10%): ${escapeHtml(formatPrice(order.nasiyaPlan.monthlyWithFee))} × ${order.nasiyaPlan.months} oy`,

@@ -12,12 +12,18 @@ import { DELIVERY } from "@/data/contact";
 import { InstallServiceChoice } from "@/components/InstallServiceChoice";
 import { PaymentMethodChoice } from "@/components/PaymentMethodChoice";
 import { SectionHeading } from "@/components/ProductCard";
-import { calcNasiya, isNasiyaEligible, type PaymentMethod } from "@/lib/nasiya";
+import {
+  calcNasiya,
+  isNasiyaEligible,
+  type NasiyaMonths,
+  type PaymentMethod,
+} from "@/lib/nasiya";
 import { useStore } from "@/lib/store";
 
 export default function CartPage() {
   const { cart, cartTotal, updateQty, removeFromCart, cartCount } = useStore();
   const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>("full");
+  const [nasiyaMonths, setNasiyaMonths] = useState<NasiyaMonths>(3);
   const [needsInstall, setNeedsInstall] = useState<boolean | null>(null);
 
   useEffect(() => {
@@ -26,7 +32,7 @@ export default function CartPage() {
     }
   }, [cartTotal, paymentMethod]);
 
-  const nasiya = calcNasiya(cartTotal);
+  const nasiya = calcNasiya(cartTotal, nasiyaMonths);
   const displayTotal =
     paymentMethod === "nasiya" && nasiya.eligible
       ? nasiya.totalPayable
@@ -151,6 +157,8 @@ export default function CartPage() {
                 total={cartTotal}
                 value={paymentMethod}
                 onChange={setPaymentMethod}
+                nasiyaMonths={nasiyaMonths}
+                onNasiyaMonthsChange={setNasiyaMonths}
                 variant="light"
               />
 
@@ -170,7 +178,7 @@ export default function CartPage() {
                 href={
                   needsInstall === null
                     ? "#"
-                    : `/buyurtma?tolov=${paymentMethod}&ornatish=${needsInstall ? "1" : "0"}`
+                    : `/buyurtma?tolov=${paymentMethod}&oy=${nasiyaMonths}&ornatish=${needsInstall ? "1" : "0"}`
                 }
                 onClick={(e) => {
                   if (needsInstall === null) e.preventDefault();

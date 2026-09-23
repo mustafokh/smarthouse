@@ -9,7 +9,12 @@ import { InstallServiceChoice } from "@/components/InstallServiceChoice";
 import { PaymentMethodChoice } from "@/components/PaymentMethodChoice";
 import { SectionHeading } from "@/components/ProductCard";
 import { createOrderRecord } from "@/lib/order";
-import { isNasiyaEligible, type PaymentMethod } from "@/lib/nasiya";
+import {
+  isNasiyaEligible,
+  normalizeNasiyaMonths,
+  type NasiyaMonths,
+  type PaymentMethod,
+} from "@/lib/nasiya";
 import { useStore } from "@/lib/store";
 
 export default function CheckoutPage() {
@@ -33,6 +38,7 @@ function CheckoutInner() {
   const [address, setAddress] = useState("");
   const [note, setNote] = useState("");
   const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>("full");
+  const [nasiyaMonths, setNasiyaMonths] = useState<NasiyaMonths>(3);
   const [needsInstall, setNeedsInstall] = useState<boolean | null>(null);
   const [error, setError] = useState("");
   const [submitting, setSubmitting] = useState(false);
@@ -43,6 +49,10 @@ function CheckoutInner() {
       setPaymentMethod("nasiya");
     } else if (fromUrl === "full") {
       setPaymentMethod("full");
+    }
+    const oy = Number(params.get("oy"));
+    if (oy === 1 || oy === 2 || oy === 3) {
+      setNasiyaMonths(normalizeNasiyaMonths(oy));
     }
     const install = params.get("ornatish");
     if (install === "1") setNeedsInstall(true);
@@ -88,6 +98,7 @@ function CheckoutInner() {
       { name, phone, address, note },
       paymentMethod,
       needsInstall,
+      nasiyaMonths,
     );
 
     try {
@@ -151,6 +162,8 @@ function CheckoutInner() {
             total={cartTotal}
             value={paymentMethod}
             onChange={setPaymentMethod}
+            nasiyaMonths={nasiyaMonths}
+            onNasiyaMonthsChange={setNasiyaMonths}
             variant="light"
           />
 

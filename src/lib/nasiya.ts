@@ -2,18 +2,19 @@
 
 export const NASIYA_MIN_AMOUNT = 100;
 export const NASIYA_DOWN_PAYMENT_PERCENT = 0.5;
-export const NASIYA_MONTHS = 3;
 export const NASIYA_MONTHLY_MARKUP = 0.1;
+export const NASIYA_MONTH_OPTIONS = [1, 2, 3] as const;
 
+export type NasiyaMonths = (typeof NASIYA_MONTH_OPTIONS)[number];
 export type PaymentMethod = "full" | "nasiya";
 
 export interface NasiyaPlan {
   downPayment: number;
   monthlyBase: number;
   monthlyWithFee: number;
-  /** 1-oy, 2-oy, 3-oy to‘lovlari (yakuniy oy qoldiq bilan tekislangan) */
+  /** Har oy to‘lovi (+10%), oy soniga qarab */
   monthPayments: number[];
-  months: number;
+  months: NasiyaMonths;
   totalPayable: number;
   remainingBase: number;
 }
@@ -26,22 +27,27 @@ export function isNasiyaEligible(total: number): boolean {
   return total >= NASIYA_MIN_AMOUNT;
 }
 
-/** 2 xona kasr — pullik format uchun */
 export function moneyRound(n: number): number {
   return Math.round((n + Number.EPSILON) * 100) / 100;
 }
 
+export function normalizeNasiyaMonths(months?: number): NasiyaMonths {
+  if (months === 1 || months === 2 || months === 3) return months;
+  return 3;
+}
+
 /**
- * Example ($120):
- * - downPayment 50% = $60
- * - remaining $60 / 3 = $20/mo base
- * - with 10% fee: $22/mo × 3
- * - totalPayable = $60 + 3×$22 = $126
+ * 50% bosh to‘lov + qolgan summa N oyga bo‘linadi, har oyga +10% nasiya.
+ * months: 1 | 2 | 3
  *
- * Display: bosh to‘lov + 1-oy / 2-oy / 3-oy alohida.
+ * $120, 3 oy: bosh 60$; oyiga 22$ × 3 → jami 126$
+ * $120, 1 oy: bosh 60$; 1-oy 66$ → jami 126$
  */
-export function calcNasiya(total: number): NasiyaCalc {
-  const months = NASIYA_MONTHS;
+export function calcNasiya(
+  total: number,
+  monthsInput: number = 3,
+): NasiyaCalc {
+  const months = normalizeNasiyaMonths(monthsInput);
 
   if (!isNasiyaEligible(total)) {
     return {
@@ -61,7 +67,6 @@ export function calcNasiya(total: number): NasiyaCalc {
   const monthlyBase = remainingBase / months;
   const rawMonthly = monthlyBase * (1 + NASIYA_MONTHLY_MARKUP);
 
-  // First N-1 months rounded; last month absorbs remainder so sum is exact
   const monthPayments: number[] = [];
   let paid = 0;
   for (let i = 0; i < months - 1; i++) {
@@ -70,8 +75,7 @@ export function calcNasiya(total: number): NasiyaCalc {
     paid += m;
   }
   const monthsTotalTarget = moneyRound(rawMonthly * months);
-  const last = moneyRound(monthsTotalTarget - paid);
-  monthPayments.push(last);
+  monthPayments.push(moneyRound(monthsTotalTarget - paid));
 
   const monthlyWithFee = monthPayments[0] ?? moneyRound(rawMonthly);
   const totalPayable = moneyRound(

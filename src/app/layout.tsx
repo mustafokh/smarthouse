@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Manrope, Outfit } from "next/font/google";
 import { StoreProvider } from "@/lib/store";
+import { I18nProvider } from "@/lib/i18n";
 import { Header, Footer } from "@/components/SiteChrome";
 import "./globals.css";
 
@@ -47,9 +48,11 @@ export default function RootLayout({
     <html lang="uz" className={`${outfit.variable} ${manrope.variable} h-full`}>
       <body className="flex min-h-full flex-col antialiased">
         <StoreProvider>
-          <Header />
-          <main className="flex-1">{children}</main>
-          <Footer />
+          <I18nProvider>
+            <Header />
+            <main className="flex-1">{children}</main>
+            <Footer />
+          </I18nProvider>
         </StoreProvider>
       </body>
     </html>
