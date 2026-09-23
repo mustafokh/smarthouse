@@ -12,6 +12,8 @@ export interface ExpenseRecord {
 export interface FinanceStore {
   orders: OrderRecord[];
   expenses: ExpenseRecord[];
+  /** Chat IDs that ran /start and may receive order notifications */
+  adminChatIds?: string[];
   updatedAt: string;
 }
 
@@ -19,6 +21,7 @@ const STORE_KEY = "smarthouse:finance";
 const EMPTY: FinanceStore = {
   orders: [],
   expenses: [],
+  adminChatIds: [],
   updatedAt: new Date(0).toISOString(),
 };
 
@@ -115,6 +118,20 @@ export async function appendExpense(
   store.expenses = store.expenses.slice(0, 2000);
   await saveFinanceStore(store);
   return expense;
+}
+
+export async function rememberAdminChatId(chatId: string | number): Promise<void> {
+  const id = String(chatId);
+  const store = await loadFinanceStore();
+  const existing = store.adminChatIds ?? [];
+  if (existing.includes(id)) return;
+  store.adminChatIds = [...existing, id].slice(-20);
+  await saveFinanceStore(store);
+}
+
+export async function getAdminChatIds(): Promise<string[]> {
+  const store = await loadFinanceStore();
+  return store.adminChatIds ?? [];
 }
 
 function inMonth(iso: string, year: number, month: number): boolean {

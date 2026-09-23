@@ -4,7 +4,9 @@ import {
   appendExpense,
   appendOrder,
   computeStats,
+  getAdminChatIds,
   loadFinanceStore,
+  rememberAdminChatId,
   type ExpenseRecord,
 } from "@/lib/finance-store";
 
@@ -40,6 +42,19 @@ export function formatOrderTelegramMessage(order: OrderRecord): string {
     timeZone: "Asia/Tashkent",
   });
 
+  const method = order.paymentMethod ?? "full";
+  const paymentLines =
+    method === "nasiya" && order.nasiyaPlan
+      ? [
+          "",
+          "<b>To‘lov — Nasiya (bo‘lib to‘lash)</b>",
+          `• Bosh to‘lov (50%): ${escapeHtml(formatPrice(order.nasiyaPlan.downPayment))}`,
+          `• Oyiga (+10%): ${escapeHtml(formatPrice(order.nasiyaPlan.monthlyWithFee))} × ${order.nasiyaPlan.months} oy`,
+          `• Qolgan asos: ${escapeHtml(formatPrice(order.nasiyaPlan.remainingBase))}`,
+          `• <b>Jami (nasiya):</b> ${escapeHtml(formatPrice(order.nasiyaPlan.totalPayable))}`,
+        ]
+      : ["", `<b>To‘lov:</b> To‘liq to‘lov — ${escapeHtml(formatPrice(order.total))}`];
+
   return [
     "🛒 <b>Yangi buyurtma — smart.house777</b>",
     "",
@@ -55,7 +70,8 @@ export function formatOrderTelegramMessage(order: OrderRecord): string {
     "<b>Mahsulotlar</b>",
     ...itemLines,
     "",
-    `<b>Jami:</b> ${escapeHtml(formatPrice(order.total))}`,
+    `<b>Mahsulotlar jami:</b> ${escapeHtml(formatPrice(order.total))}`,
+    ...paymentLines,
     `<b>Yetkazish:</b> Toshkent shahar bo‘ylab bepul`,
     "",
     "<i>/statistika · /oylik · /balans</i>",
@@ -69,38 +85,63 @@ export async function sendTelegramMessage(
   chatId?: string,
 ): Promise<void> {
   const token = process.env.TELEGRAM_BOT_TOKEN;
-  const target = chatId ?? process.env.TELEGRAM_CHAT_ID;
-
-  if (!token || !target) {
-    throw new Error("TELEGRAM_BOT_TOKEN yoki TELEGRAM_CHAT_ID sozlanmagan");
+  if (!token) {
+    throw new Error("TELEGRAM_BOT_TOKEN sozlanmagan");
   }
 
-  const response = await fetch(
-    `https://api.telegram.org/bot${token}/sendMessage`,
-    {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        chat_id: target,
-        text,
-        parse_mode: "HTML",
-      }),
-    },
-  );
-
-  if (!response.ok) {
-    const body = await response.text();
-    throw new Error(`Telegram API xatoligi: ${response.status} ${body}`);
+  const candidates: string[] = [];
+  if (chatId) candidates.push(chatId);
+  for (const id of envAdminIds()) {
+    if (!candidates.includes(id)) candidates.push(id);
   }
+  for (const id of await getAdminChatIds()) {
+    if (!candidates.includes(id)) candidates.push(id);
+  }
+
+  if (candidates.length === 0) {
+    throw new Error("TELEGRAM_CHAT_ID sozlanmagan va admin chat hali yo‘q");
+  }
+
+  let lastError = "";
+  for (const target of candidates) {
+    const response = await fetch(
+      `https://api.telegram.org/bot${token}/sendMessage`,
+      {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          chat_id: target,
+          text,
+          parse_mode: "HTML",
+        }),
+      },
+    );
+
+    if (response.ok) return;
+    lastError = await response.text();
+    // Explicit chatId (webhook reply) — don't silently try others
+    if (chatId) break;
+  }
+
+  throw new Error(`Telegram API xatoligi: ${lastError}`);
 }
 
-function isAdmin(chatId: number | string): boolean {
-  const allowed = (process.env.TELEGRAM_CHAT_ID ?? "")
+function envAdminIds(): string[] {
+  return (process.env.TELEGRAM_CHAT_ID ?? "")
     .split(",")
     .map((s) => s.trim())
     .filter(Boolean);
-  if (allowed.length === 0) return true;
-  return allowed.includes(String(chatId));
+}
+
+async function isAdmin(chatId: number | string): Promise<boolean> {
+  const id = String(chatId);
+  const envIds = envAdminIds();
+  if (envIds.includes(id)) return true;
+  const stored = await getAdminChatIds();
+  if (stored.includes(id)) return true;
+  // No configured admins yet — first interactors are allowed
+  if (envIds.length === 0 && stored.length === 0) return true;
+  return false;
 }
 
 function helpText(): string {
@@ -275,19 +316,23 @@ export async function handleTelegramUpdate(update: {
   const command = commandRaw.split("@")[0].toLowerCase();
   const arg = rest.join(" ").trim();
 
-  if (!isAdmin(chatId)) {
-    await sendTelegramMessage(
-      "⛔ Bu bot faqat smart.house777 admini uchun.",
-      String(chatId),
-    );
-    return;
-  }
-
   const reply = async (body: string) =>
     sendTelegramMessage(body, String(chatId));
 
+  // Always answer /start and /yordam so the owner never sees silence
+  // even if TELEGRAM_CHAT_ID env is missing or wrong.
   if (command === "/start" || command === "/yordam" || command === "/help") {
+    const envIds = envAdminIds();
+    const id = String(chatId);
+    if (envIds.length === 0 || !envIds.includes(id)) {
+      await rememberAdminChatId(id);
+    }
     await reply(helpText());
+    return;
+  }
+
+  if (!(await isAdmin(chatId))) {
+    await reply("⛔ Bu bot faqat smart.house777 admini uchun.");
     return;
   }
 

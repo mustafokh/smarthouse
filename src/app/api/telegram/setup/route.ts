@@ -29,13 +29,23 @@ export async function GET(request: Request) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
+  // Prefer www — apex smarthouse777.uz 308-redirects to www and Telegram
+  // does not reliably follow redirects for webhooks.
   const origin =
     process.env.NEXT_PUBLIC_SITE_URL ??
     (process.env.VERCEL_PROJECT_PRODUCTION_URL
       ? `https://${process.env.VERCEL_PROJECT_PRODUCTION_URL}`
-      : "https://smarthouse777.uz");
+      : "https://www.smarthouse777.uz");
 
-  const webhookUrl = `${origin.replace(/\/$/, "")}/api/telegram/webhook`;
+  let webhookUrl = `${origin.replace(/\/$/, "")}/api/telegram/webhook`;
+  try {
+    const host = new URL(webhookUrl).host;
+    if (host === "smarthouse777.uz") {
+      webhookUrl = "https://www.smarthouse777.uz/api/telegram/webhook";
+    }
+  } catch {
+    webhookUrl = "https://www.smarthouse777.uz/api/telegram/webhook";
+  }
 
   const setWebhook = await fetch(
     `https://api.telegram.org/bot${token}/setWebhook`,
