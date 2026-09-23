@@ -5,6 +5,7 @@ import { FormEvent, Suspense, useEffect, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { formatPrice } from "@/data/products";
 import { DELIVERY, OWNER_PHONE } from "@/data/contact";
+import { InstallServiceChoice } from "@/components/InstallServiceChoice";
 import { PaymentMethodChoice } from "@/components/PaymentMethodChoice";
 import { SectionHeading } from "@/components/ProductCard";
 import { createOrderRecord } from "@/lib/order";
@@ -32,6 +33,7 @@ function CheckoutInner() {
   const [address, setAddress] = useState("");
   const [note, setNote] = useState("");
   const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>("full");
+  const [needsInstall, setNeedsInstall] = useState<boolean | null>(null);
   const [error, setError] = useState("");
   const [submitting, setSubmitting] = useState(false);
 
@@ -42,6 +44,9 @@ function CheckoutInner() {
     } else if (fromUrl === "full") {
       setPaymentMethod("full");
     }
+    const install = params.get("ornatish");
+    if (install === "1") setNeedsInstall(true);
+    if (install === "0") setNeedsInstall(false);
   }, [params, cartTotal]);
 
   useEffect(() => {
@@ -70,6 +75,10 @@ function CheckoutInner() {
       setError("Ism va telefon majburiy.");
       return;
     }
+    if (needsInstall === null) {
+      setError("O‘rnatib berish xizmati kerakmi yoki yo‘q — tanlang.");
+      return;
+    }
 
     setError("");
     setSubmitting(true);
@@ -78,6 +87,7 @@ function CheckoutInner() {
       cart,
       { name, phone, address, note },
       paymentMethod,
+      needsInstall,
     );
 
     try {
@@ -141,6 +151,12 @@ function CheckoutInner() {
             total={cartTotal}
             value={paymentMethod}
             onChange={setPaymentMethod}
+            variant="light"
+          />
+
+          <InstallServiceChoice
+            value={needsInstall}
+            onChange={setNeedsInstall}
             variant="light"
           />
 

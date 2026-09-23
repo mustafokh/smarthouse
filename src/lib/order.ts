@@ -10,6 +10,7 @@ export function createOrderRecord(
   cart: CartItem[],
   data: { name: string; phone: string; address: string; note: string },
   paymentMethod: PaymentMethod = "full",
+  needsInstall = false,
 ): OrderRecord {
   const total = cart.reduce((sum, item) => {
     const p = getProductByCode(item.productId);
@@ -29,5 +30,6 @@ export function createOrderRecord(
     status: "yangi",
     paymentMethod: method,
     nasiyaPlan: method === "nasiya" ? toNasiyaPlan(nasiya) : undefined,
+    needsInstall,
   };
 }

@@ -85,6 +85,10 @@ function OrdersInner() {
                   {o.paymentMethod === "nasiya" && o.nasiyaPlan
                     ? `Nasiya: bosh ${formatPrice(o.nasiyaPlan.downPayment)} · oyiga ${formatPrice(o.nasiyaPlan.monthlyWithFee)} × ${o.nasiyaPlan.months}`
                     : "To‘liq to‘lov"}
+                  {" · "}
+                  {o.needsInstall
+                    ? "O‘rnatish: kerak (kelishiladi)"
+                    : "O‘rnatish: kerak emas"}
                 </p>
               </li>
             ))}

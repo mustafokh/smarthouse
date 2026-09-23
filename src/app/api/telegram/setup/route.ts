@@ -10,6 +10,11 @@ const COMMANDS = [
   { command: "chiqimlar", description: "Chiqimlar ro‘yxati" },
   { command: "balans", description: "Kirim − chiqim" },
   { command: "mahsulotlar", description: "Eng ko‘p sotilganlar" },
+  { command: "sklad", description: "Sklad qoldiqlari" },
+  { command: "qoldiq", description: "Bitta mahsulot qoldig‘i + rasm" },
+  { command: "sklad_set", description: "Qoldiq belgilash" },
+  { command: "sklad_plus", description: "Skladga kirim" },
+  { command: "sklad_minus", description: "Skladdan chiqim" },
   { command: "yordam", description: "Yordam" },
 ];
 

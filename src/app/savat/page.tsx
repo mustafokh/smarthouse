@@ -9,6 +9,7 @@ import {
   getProductByCode,
 } from "@/data/products";
 import { DELIVERY } from "@/data/contact";
+import { InstallServiceChoice } from "@/components/InstallServiceChoice";
 import { PaymentMethodChoice } from "@/components/PaymentMethodChoice";
 import { SectionHeading } from "@/components/ProductCard";
 import { calcNasiya, isNasiyaEligible, type PaymentMethod } from "@/lib/nasiya";
@@ -17,6 +18,7 @@ import { useStore } from "@/lib/store";
 export default function CartPage() {
   const { cart, cartTotal, updateQty, removeFromCart, cartCount } = useStore();
   const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>("full");
+  const [needsInstall, setNeedsInstall] = useState<boolean | null>(null);
 
   useEffect(() => {
     if (!isNasiyaEligible(cartTotal) && paymentMethod === "nasiya") {
@@ -152,9 +154,33 @@ export default function CartPage() {
                 variant="dark"
               />
 
+              <InstallServiceChoice
+                value={needsInstall}
+                onChange={setNeedsInstall}
+                variant="dark"
+              />
+
+              {needsInstall === null ? (
+                <p className="rounded-xl bg-white/10 px-3 py-2 text-xs text-white/80">
+                  Davom etishdan oldin o‘rnatish xizmatini tanlang.
+                </p>
+              ) : null}
+
               <Link
-                href={`/buyurtma?tolov=${paymentMethod}`}
-                className="mt-2 block rounded-xl bg-cyan py-3.5 text-center text-sm font-bold text-brand hover:bg-cyan-soft"
+                href={
+                  needsInstall === null
+                    ? "#"
+                    : `/buyurtma?tolov=${paymentMethod}&ornatish=${needsInstall ? "1" : "0"}`
+                }
+                onClick={(e) => {
+                  if (needsInstall === null) e.preventDefault();
+                }}
+                aria-disabled={needsInstall === null}
+                className={`mt-2 block rounded-xl py-3.5 text-center text-sm font-bold ${
+                  needsInstall === null
+                    ? "cursor-not-allowed bg-white/20 text-white/50"
+                    : "bg-cyan text-brand hover:bg-cyan-soft"
+                }`}
               >
                 Buyurtmani rasmiylashtirish
               </Link>

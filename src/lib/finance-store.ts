@@ -14,6 +14,8 @@ export interface FinanceStore {
   expenses: ExpenseRecord[];
   /** Chat IDs that ran /start and may receive order notifications */
   adminChatIds?: string[];
+  /** Stock by "PRODUCT_ID:color" -> qty */
+  stock?: Record<string, number>;
   updatedAt: string;
 }
 
@@ -98,9 +100,63 @@ export async function appendOrder(order: OrderRecord): Promise<void> {
   const store = await loadFinanceStore();
   if (store.orders.some((o) => o.id === order.id)) return;
   store.orders.unshift(order);
-  // keep last 2000
   store.orders = store.orders.slice(0, 2000);
+  // Decrement sklad on sale
+  if (!store.stock) store.stock = {};
+  for (const item of order.items) {
+    const key = stockKey(item.productId, item.color);
+    const current = store.stock[key] ?? DEFAULT_STOCK;
+    store.stock[key] = Math.max(0, current - item.qty);
+  }
   await saveFinanceStore(store);
+}
+
+export const DEFAULT_STOCK = 20;
+
+export function stockKey(productId: string, color: string): string {
+  return `${productId}:${color}`;
+}
+
+export async function getStockMap(): Promise<Record<string, number>> {
+  const store = await loadFinanceStore();
+  return store.stock ?? {};
+}
+
+export async function setStockQty(
+  productId: string,
+  color: string,
+  qty: number,
+): Promise<number> {
+  const store = await loadFinanceStore();
+  if (!store.stock) store.stock = {};
+  const key = stockKey(productId, color);
+  store.stock[key] = Math.max(0, Math.floor(qty));
+  await saveFinanceStore(store);
+  return store.stock[key];
+}
+
+export async function adjustStockQty(
+  productId: string,
+  color: string,
+  delta: number,
+): Promise<number> {
+  const store = await loadFinanceStore();
+  if (!store.stock) store.stock = {};
+  const key = stockKey(productId, color);
+  const current = store.stock[key] ?? DEFAULT_STOCK;
+  store.stock[key] = Math.max(0, current + delta);
+  await saveFinanceStore(store);
+  return store.stock[key];
+}
+
+export function resolveStockQty(
+  stock: Record<string, number> | undefined,
+  productId: string,
+  color: string,
+): number {
+  const key = stockKey(productId, color);
+  if (stock && key in stock) return stock[key];
+  return DEFAULT_STOCK;
 }
 
 export async function appendExpense(

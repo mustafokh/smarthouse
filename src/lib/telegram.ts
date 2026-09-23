@@ -1,12 +1,15 @@
-import { colorLabels, formatPrice, getProductByCode } from "@/data/products";
+import { colorLabels, formatPrice, getProductByCode, products } from "@/data/products";
 import type { OrderRecord } from "@/lib/store";
 import {
+  adjustStockQty,
   appendExpense,
   appendOrder,
   computeStats,
   getAdminChatIds,
   loadFinanceStore,
   rememberAdminChatId,
+  resolveStockQty,
+  setStockQty,
   type ExpenseRecord,
 } from "@/lib/finance-store";
 
@@ -72,9 +75,12 @@ export function formatOrderTelegramMessage(order: OrderRecord): string {
     "",
     `<b>Mahsulotlar jami:</b> ${escapeHtml(formatPrice(order.total))}`,
     ...paymentLines,
+    order.needsInstall
+      ? `<b>O‘rnatish:</b> ✅ Kerak (narx kelishuv asosida)`
+      : `<b>O‘rnatish:</b> ❌ Kerak emas`,
     `<b>Yetkazish:</b> Toshkent shahar bo‘ylab bepul`,
     "",
-    "<i>/statistika · /oylik · /balans</i>",
+    "<i>/statistika · /oylik · /sklad · /balans</i>",
   ]
     .filter(Boolean)
     .join("\n");
@@ -150,16 +156,21 @@ function helpText(): string {
     "",
     "Buyurtmalar saytdan kelganda shu yerga tushadi.",
     "",
-    "<b>Buyruqlar:</b>",
+    "<b>Sotuv:</b>",
     "/statistika — umumiy sotuv",
     "/oylik — joriy oy hisoboti",
     "/oylik 2026-09 — tanlangan oy",
     "/buyurtmalar — so‘nggi buyurtmalar",
-    "/kirim — jami kirim (sotuv)",
-    "/chiqim 50 yetkazish — chiqim qo‘shish",
-    "/chiqimlar — so‘nggi chiqimlar",
-    "/balans — kirim − chiqim",
+    "/kirim · /chiqim 50 izoh · /chiqimlar · /balans",
     "/mahsulotlar — eng ko‘p sotilganlar",
+    "",
+    "<b>Sklad (qoldiq):</b>",
+    "/sklad — barcha qoldiqlar",
+    "/qoldiq VKL-001 — bitta mahsulot (rang + rasm)",
+    "/sklad_set VKL-001 white 30 — qoldiqni belgilash",
+    "/sklad_plus VKL-001 white 5 — kirim",
+    "/sklad_minus VKL-001 white 2 — chiqim",
+    "",
     "/yordam — shu menyu",
   ].join("\n");
 }
@@ -295,6 +306,92 @@ function parseMonthArg(arg?: string): { year: number; month: number } | null {
   return { year, month };
 }
 
+export async function sendTelegramPhoto(
+  photoUrl: string,
+  caption: string,
+  chatId: string,
+): Promise<void> {
+  const token = process.env.TELEGRAM_BOT_TOKEN;
+  if (!token) return;
+  const response = await fetch(
+    `https://api.telegram.org/bot${token}/sendPhoto`,
+    {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        chat_id: chatId,
+        photo: photoUrl,
+        caption,
+        parse_mode: "HTML",
+      }),
+    },
+  );
+  if (!response.ok) {
+    console.error("[telegram photo]", await response.text());
+  }
+}
+
+function siteOrigin(): string {
+  return (
+    process.env.NEXT_PUBLIC_SITE_URL?.replace(/\/$/, "") ||
+    "https://www.smarthouse777.uz"
+  );
+}
+
+function absoluteProductImage(
+  productId: string,
+  color: string,
+): string | null {
+  const p = getProductByCode(productId);
+  if (!p) return null;
+  const path =
+    p.imagesByColor?.[color as keyof typeof p.imagesByColor] ?? p.image;
+  if (!path) return null;
+  if (path.startsWith("http")) return path;
+  return `${siteOrigin()}${path}`;
+}
+
+function formatSkladList(
+  stock: Record<string, number> | undefined,
+): string {
+  const lines: string[] = ["📦 <b>Sklad qoldiqlari</b>", ""];
+  let totalUnits = 0;
+  for (const p of products) {
+    const parts = p.colors.map((c) => {
+      const q = resolveStockQty(stock, p.id, c);
+      totalUnits += q;
+      return `${colorLabels[c]}:${q}`;
+    });
+    lines.push(
+      `• <b>${escapeHtml(p.code)}</b> ${escapeHtml(p.nameUz)} — ${parts.join(" · ")}`,
+    );
+  }
+  lines.push("", `Jami dona: <b>${totalUnits}</b>`);
+  lines.push("<i>Batafsil: /qoldiq VKL-001</i>");
+  return lines.join("\n");
+}
+
+function parseColorToken(raw: string): string | null {
+  const map: Record<string, string> = {
+    white: "white",
+    oq: "white",
+    black: "black",
+    qora: "black",
+    gold: "gold",
+    oltin: "gold",
+    gray: "gray",
+    grey: "gray",
+    kulrang: "gray",
+    rgb: "rgb",
+    yellow: "yellow",
+    sariq: "yellow",
+    pink: "pink",
+    pushti: "pink",
+    teal: "teal",
+  };
+  return map[raw.toLowerCase()] ?? null;
+}
+
 export async function notifyNewOrder(order: OrderRecord): Promise<void> {
   await appendOrder(order);
   await sendTelegramMessage(formatOrderTelegramMessage(order));
@@ -421,6 +518,93 @@ export async function handleTelegramUpdate(update: {
 
   if (command === "/mahsulotlar" || command === "/products") {
     await reply(formatTopProducts(store));
+    return;
+  }
+
+  if (command === "/sklad" || command === "/qoldiqlar") {
+    await reply(formatSkladList(store.stock));
+    return;
+  }
+
+  if (command === "/qoldiq") {
+    const code = arg.trim().split(/\s+/)[0];
+    if (!code) {
+      await reply("Misol: <code>/qoldiq VKL-001</code>");
+      return;
+    }
+    const product = getProductByCode(code);
+    if (!product) {
+      await reply(`Mahsulot topilmadi: ${escapeHtml(code)}`);
+      return;
+    }
+    const lines = [
+      `📦 <b>${escapeHtml(product.code)}</b> — ${escapeHtml(product.nameUz)}`,
+      `💰 ${escapeHtml(formatPrice(product.price))}`,
+      "",
+    ];
+    for (const c of product.colors) {
+      const q = resolveStockQty(store.stock, product.id, c);
+      lines.push(`• ${colorLabels[c]}: <b>${q}</b> dona`);
+    }
+    await reply(lines.join("\n"));
+
+    // Send one photo per color (max 5) so admin sees stickers/colors
+    for (const c of product.colors.slice(0, 5)) {
+      const url = absoluteProductImage(product.id, c);
+      if (!url) continue;
+      const q = resolveStockQty(store.stock, product.id, c);
+      await sendTelegramPhoto(
+        url,
+        `${product.code} · ${colorLabels[c]} · qoldiq: ${q}`,
+        String(chatId),
+      );
+    }
+    return;
+  }
+
+  if (
+    command === "/sklad_set" ||
+    command === "/sklad_plus" ||
+    command === "/sklad_minus"
+  ) {
+    const parts = arg.trim().split(/\s+/);
+    if (parts.length < 3) {
+      await reply(
+        "Misol:\n<code>/sklad_set VKL-001 white 30</code>\n<code>/sklad_plus VKL-001 white 5</code>\n<code>/sklad_minus VKL-001 black 2</code>",
+      );
+      return;
+    }
+    const [code, colorRaw, qtyRaw] = parts;
+    const product = getProductByCode(code);
+    const color = parseColorToken(colorRaw);
+    const qty = Number(qtyRaw);
+    if (!product) {
+      await reply(`Mahsulot topilmadi: ${escapeHtml(code)}`);
+      return;
+    }
+    if (!color || !product.colors.includes(color as (typeof product.colors)[number])) {
+      await reply(
+        `Rang noto‘g‘ri. Mavjud: ${product.colors.map((c) => colorLabels[c]).join(", ")}`,
+      );
+      return;
+    }
+    if (!Number.isFinite(qty) || qty < 0) {
+      await reply("Miqdor noto‘g‘ri.");
+      return;
+    }
+
+    let next = 0;
+    if (command === "/sklad_set") {
+      next = await setStockQty(product.id, color, qty);
+    } else if (command === "/sklad_plus") {
+      next = await adjustStockQty(product.id, color, qty);
+    } else {
+      next = await adjustStockQty(product.id, color, -qty);
+    }
+
+    await reply(
+      `✅ Sklad yangilandi\n${escapeHtml(product.code)} · ${colorLabels[color as keyof typeof colorLabels]} → <b>${next}</b> dona`,
+    );
     return;
   }
 

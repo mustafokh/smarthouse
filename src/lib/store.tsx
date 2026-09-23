@@ -36,6 +36,8 @@ export interface OrderRecord {
   status: "yangi" | "ko'rib chiqilmoqda" | "tasdiqlangan";
   paymentMethod: PaymentMethod;
   nasiyaPlan?: NasiyaPlan;
+  /** O‘rnatib berish xizmati (narx kelishuv asosida) */
+  needsInstall?: boolean;
 }
 
 interface StoreContextValue {
@@ -56,6 +58,7 @@ interface StoreContextValue {
     address: string;
     note: string;
     paymentMethod?: PaymentMethod;
+    needsInstall?: boolean;
   }) => OrderRecord;
   commitOrder: (order: OrderRecord) => void;
 }
@@ -186,6 +189,7 @@ export function StoreProvider({ children }: { children: ReactNode }) {
       address: string;
       note: string;
       paymentMethod?: PaymentMethod;
+      needsInstall?: boolean;
     }) => {
       const total = cart.reduce((sum, item) => {
         const p = getProductByCode(item.productId);
@@ -210,6 +214,7 @@ export function StoreProvider({ children }: { children: ReactNode }) {
         paymentMethod,
         nasiyaPlan:
           paymentMethod === "nasiya" ? toNasiyaPlan(nasiya) : undefined,
+        needsInstall: data.needsInstall ?? false,
       };
       setOrders((prev) => [order, ...prev]);
       setCart([]);
