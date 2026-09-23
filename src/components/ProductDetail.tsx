@@ -30,19 +30,18 @@ export function ProductDetail({ product }: { product: Product }) {
     () =>
       products
         .filter((p) => p.category === product.category && p.id !== product.id)
-        .slice(0, 3),
+        .slice(0, 4),
     [product],
   );
 
   const wish = isWishlisted(product.id);
-  const displayImage =
-    product.imagesByColor?.[color] ?? product.image;
+  const displayImage = product.imagesByColor?.[color] ?? product.image;
 
   return (
-    <div className="bg-circuit min-h-screen">
-      <div className="mx-auto max-w-6xl px-4 py-10 sm:px-6">
+    <div className="soft-page min-h-screen">
+      <div className="mx-auto max-w-6xl px-4 py-8 sm:px-6 sm:py-10">
         <nav className="text-sm text-muted">
-          <Link href="/katalog" className="hover:text-cyan">
+          <Link href="/katalog" className="hover:text-accent">
             Katalog
           </Link>
           {cat && (
@@ -50,46 +49,79 @@ export function ProductDetail({ product }: { product: Product }) {
               <span className="mx-2">/</span>
               <Link
                 href={`/kategoriya/${cat.slug}`}
-                className="hover:text-cyan"
+                className="hover:text-accent"
               >
                 {cat.name}
               </Link>
             </>
           )}
           <span className="mx-2">/</span>
-          <span className="text-brand">{product.code}</span>
+          <span className="text-slate-800">{product.code}</span>
         </nav>
 
-        <div className="mt-8 grid gap-10 lg:grid-cols-2">
-          <div className="relative aspect-square overflow-hidden rounded-3xl border border-line bg-gradient-to-br from-white to-mist shadow-sm">
+        <div className="mt-6 grid gap-8 lg:grid-cols-2 lg:gap-12">
+          <div className="relative aspect-square overflow-hidden rounded-[2rem] bg-white shadow-[0_16px_48px_-20px_rgba(15,23,42,0.18)]">
             <Image
               key={displayImage}
               src={displayImage}
               alt={product.nameUz}
               fill
-              className="object-contain p-6 sm:p-10"
+              className="object-contain p-8 sm:p-12"
               sizes="(max-width:1024px) 100vw, 50vw"
               priority
             />
           </div>
 
           <div>
-            <p className="text-xs font-semibold uppercase tracking-[0.2em] text-cyan">
-              {product.code} · {product.protocol}
-            </p>
-            <h1 className="mt-2 font-display text-3xl font-bold text-brand sm:text-4xl">
-              {product.nameUz}
-            </h1>
-            <p className="mt-2 text-sm text-muted">{product.name}</p>
-            <p className="mt-6 font-display text-4xl font-extrabold text-brand">
-              {formatPrice(product.price)}
-            </p>
-            <p className="mt-4 leading-relaxed text-muted">
+            <div className="flex items-start justify-between gap-3">
+              <div>
+                <p className="text-xs font-semibold uppercase tracking-[0.16em] text-accent">
+                  {product.code} · {product.protocol}
+                </p>
+                <h1 className="mt-2 font-display text-3xl font-bold text-slate-900 sm:text-4xl">
+                  {product.nameUz}
+                </h1>
+              </div>
+              <button
+                type="button"
+                onClick={() => toggleWishlist(product.id)}
+                className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-white shadow-sm ${
+                  wish ? "text-rose-500" : "text-slate-400"
+                }`}
+                aria-label="Sevimli"
+              >
+                ♥
+              </button>
+            </div>
+
+            <p className="mt-3 text-sm leading-relaxed text-muted">
               {product.description}
             </p>
 
+            <div className="mt-6 flex flex-wrap items-end gap-4">
+              <p className="font-display text-4xl font-extrabold text-slate-900">
+                {formatPrice(product.price)}
+              </p>
+              <span className="rounded-full bg-amber-50 px-3 py-1 text-xs font-semibold text-amber-600">
+                ★ 4.8 · sifatli
+              </span>
+            </div>
+
+            <div className="mt-8 grid grid-cols-2 gap-3 sm:grid-cols-4">
+              {product.specs.slice(0, 4).map((s) => (
+                <div
+                  key={s}
+                  className="rounded-2xl bg-accent-tint px-3 py-3 text-center"
+                >
+                  <p className="text-[11px] font-semibold leading-snug text-accent">
+                    {s}
+                  </p>
+                </div>
+              ))}
+            </div>
+
             <div className="mt-8">
-              <p className="text-sm font-semibold text-brand">
+              <p className="text-sm font-semibold text-slate-800">
                 Rang — {colorLabels[color]}
               </p>
               <div className="mt-3">
@@ -103,11 +135,11 @@ export function ProductDetail({ product }: { product: Product }) {
             </div>
 
             <div className="mt-6">
-              <p className="text-sm font-semibold text-brand">Miqdor</p>
-              <div className="mt-2 inline-flex items-center rounded-xl border border-line bg-white">
+              <p className="text-sm font-semibold text-slate-800">Miqdor</p>
+              <div className="mt-2 inline-flex items-center rounded-full bg-white shadow-sm">
                 <button
                   type="button"
-                  className="px-4 py-2 text-lg font-bold text-brand"
+                  className="px-4 py-2 text-lg font-bold text-slate-700"
                   onClick={() => setQty((q) => Math.max(1, q - 1))}
                 >
                   –
@@ -115,7 +147,7 @@ export function ProductDetail({ product }: { product: Product }) {
                 <span className="min-w-10 text-center font-semibold">{qty}</span>
                 <button
                   type="button"
-                  className="px-4 py-2 text-lg font-bold text-brand"
+                  className="px-4 py-2 text-lg font-bold text-slate-700"
                   onClick={() => setQty((q) => q + 1)}
                 >
                   +
@@ -131,40 +163,33 @@ export function ProductDetail({ product }: { product: Product }) {
                   setAdded(true);
                   setTimeout(() => setAdded(false), 2000);
                 }}
-                className="rounded-xl bg-cyan px-6 py-3.5 text-sm font-bold text-brand shadow-md shadow-cyan/20 hover:bg-cyan-soft"
+                className="rounded-full bg-accent px-7 py-3.5 text-sm font-bold text-white shadow-lg shadow-blue-500/30 hover:bg-accent-soft"
               >
                 {added ? "Qo‘shildi ✓" : "Savatga qo‘shish"}
               </button>
-              <button
-                type="button"
-                onClick={() => toggleWishlist(product.id)}
-                className={`rounded-xl border px-6 py-3.5 text-sm font-semibold ${
-                  wish
-                    ? "border-cyan bg-cyan/10 text-brand"
-                    : "border-line text-brand hover:border-cyan"
-                }`}
-              >
-                {wish ? "Sevimlilarda" : "Sevimlilarga"}
-              </button>
               <Link
                 href="/aloqa"
-                className="rounded-xl border border-brand/20 bg-brand px-6 py-3.5 text-sm font-semibold text-white hover:bg-brand-deep"
+                className="rounded-full bg-slate-900 px-6 py-3.5 text-sm font-semibold text-white hover:bg-slate-800"
               >
                 Konsultatsiya
               </Link>
               <a
                 href={OWNER_PHONE.telHref}
-                className="rounded-xl border border-cyan px-6 py-3.5 text-sm font-semibold text-brand hover:bg-cyan/10"
+                className="rounded-full border border-line bg-white px-6 py-3.5 text-sm font-semibold text-slate-700"
               >
                 {OWNER_PHONE.display}
               </a>
             </div>
 
-            <ul className="mt-10 space-y-2 rounded-2xl border border-line bg-white/80 p-5">
+            <ul className="mt-10 space-y-3 rounded-[1.5rem] bg-white p-5 shadow-sm">
+              <p className="text-sm font-semibold text-slate-900">Texnik xususiyatlar</p>
               {product.specs.map((s) => (
-                <li key={s} className="flex gap-2 text-sm text-muted">
-                  <span className="text-cyan">▸</span>
-                  {s}
+                <li
+                  key={s}
+                  className="flex justify-between gap-4 border-b border-line/80 pb-2 text-sm last:border-0 last:pb-0"
+                >
+                  <span className="text-muted">Spec</span>
+                  <span className="font-medium text-slate-800">{s}</span>
                 </li>
               ))}
             </ul>
@@ -172,9 +197,9 @@ export function ProductDetail({ product }: { product: Product }) {
         </div>
 
         {related.length > 0 && (
-          <div className="mt-20">
+          <div className="mt-16">
             <SectionHeading title="O‘xshash mahsulotlar" />
-            <div className="mt-8 grid grid-cols-2 gap-3 sm:gap-4 md:grid-cols-3 lg:grid-cols-4">
+            <div className="mt-6 grid grid-cols-2 gap-3 sm:gap-4 md:grid-cols-3 lg:grid-cols-4">
               {related.map((p) => (
                 <ProductCard key={p.id} product={p} />
               ))}

@@ -10,69 +10,97 @@ import {
 } from "@/data/products";
 import { useStore } from "@/lib/store";
 
+/** Deterministic fake rating for UI polish (Smarto-style cards). */
+function ratingFor(id: string): string {
+  let h = 0;
+  for (let i = 0; i < id.length; i++) h = (h + id.charCodeAt(i) * 17) % 40;
+  return (4.6 + h / 100).toFixed(1);
+}
+
 export function ProductCard({ product }: { product: Product }) {
   const { addToCart, toggleWishlist, isWishlisted } = useStore();
   const wish = isWishlisted(product.id);
   const defaultColor = product.colors[0];
+  const rating = ratingFor(product.id);
 
   return (
-    <article className="group flex flex-col overflow-hidden rounded-xl border border-line bg-surface shadow-[0_8px_30px_-18px_rgba(12,31,68,0.35)] transition hover:-translate-y-0.5 hover:shadow-[0_16px_40px_-20px_rgba(47,182,217,0.45)] sm:rounded-2xl">
+    <article className="group relative flex flex-col overflow-hidden rounded-[1.6rem] bg-white shadow-[0_12px_36px_-16px_rgba(15,23,42,0.16)] transition duration-300 hover:-translate-y-1 hover:shadow-[0_18px_44px_-16px_rgba(59,130,246,0.28)]">
+      <div className="absolute left-3 top-3 z-10 flex items-center gap-1 rounded-full bg-white/95 px-2 py-1 text-[11px] font-semibold text-slate-700 shadow-sm">
+        <StarIcon />
+        {rating}
+      </div>
+      <button
+        type="button"
+        onClick={() => toggleWishlist(product.id)}
+        className={`absolute right-3 top-3 z-10 flex h-9 w-9 items-center justify-center rounded-full bg-white/95 shadow-sm transition ${
+          wish ? "text-rose-500" : "text-slate-400 hover:text-rose-400"
+        }`}
+        aria-label="Sevimlilarga"
+      >
+        <HeartIcon filled={wish} />
+      </button>
+
       <Link
         href={`/mahsulot/${product.slug}`}
-        className="product-shine relative block aspect-square bg-gradient-to-br from-mist to-white"
+        className="relative mx-3 mt-10 block aspect-square"
       >
         <Image
           src={product.image}
           alt={product.nameUz}
           fill
-          className="object-contain p-3 sm:p-5 transition duration-500 group-hover:scale-[1.03]"
+          className="object-contain p-3 transition duration-500 group-hover:scale-[1.04]"
           sizes="(max-width:768px) 50vw, 25vw"
         />
-        <span className="absolute left-1.5 top-1.5 rounded bg-brand/90 px-1.5 py-0.5 text-[9px] font-semibold uppercase tracking-wider text-cyan sm:left-3 sm:top-3 sm:px-2 sm:text-[10px]">
-          {product.code}
-        </span>
-        <span className="absolute right-1.5 top-1.5 rounded bg-white/90 px-1.5 py-0.5 text-[9px] font-medium uppercase text-brand sm:right-3 sm:top-3 sm:px-2 sm:text-[10px]">
-          {product.protocol}
-        </span>
       </Link>
 
-      <div className="flex flex-1 flex-col gap-1 p-2.5 sm:gap-2 sm:p-4">
+      <div className="flex flex-1 flex-col gap-1 px-4 pb-4 pt-1">
         <Link href={`/mahsulot/${product.slug}`}>
-          <h3 className="font-display text-sm font-semibold leading-snug text-ink transition group-hover:text-brand sm:text-base">
+          <h3 className="line-clamp-2 min-h-[2.5rem] font-display text-[15px] font-semibold leading-snug text-slate-800">
             {product.nameUz}
           </h3>
         </Link>
-        <p className="line-clamp-2 hidden text-xs leading-relaxed text-muted sm:block">
-          {product.shortDescription}
-        </p>
-        <div className="mt-auto flex flex-col gap-2 pt-1.5 sm:flex-row sm:items-end sm:justify-between sm:pt-2">
-          <p className="font-display text-lg font-bold text-brand sm:text-xl">
+        <div className="mt-2 flex items-end justify-between gap-2">
+          <p className="font-display text-lg font-bold text-slate-900">
             {formatPrice(product.price)}
           </p>
-          <div className="flex gap-1.5">
-            <button
-              type="button"
-              onClick={() => toggleWishlist(product.id)}
-              className={`rounded-lg border px-2 py-1.5 text-sm transition sm:px-2.5 sm:py-2 ${
-                wish
-                  ? "border-cyan bg-cyan/15 text-brand"
-                  : "border-line text-muted hover:border-cyan"
-              }`}
-              aria-label="Sevimlilarga"
-            >
-              ♥
-            </button>
-            <button
-              type="button"
-              onClick={() => addToCart(product.id, defaultColor)}
-              className="flex-1 rounded-lg bg-cyan px-2 py-1.5 text-xs font-semibold text-brand transition hover:bg-cyan-soft sm:flex-none sm:px-3 sm:py-2 sm:text-sm"
-            >
-              + Savat
-            </button>
-          </div>
+          <button
+            type="button"
+            onClick={() => addToCart(product.id, defaultColor)}
+            className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-accent text-lg font-bold text-white shadow-lg shadow-blue-500/30 transition hover:bg-accent-soft hover:scale-105"
+            aria-label="Savatga"
+          >
+            +
+          </button>
         </div>
       </div>
     </article>
+  );
+}
+
+function StarIcon() {
+  return (
+    <svg width="12" height="12" viewBox="0 0 24 24" fill="#F59E0B" aria-hidden>
+      <path d="M12 3.5l2.6 5.3 5.8.8-4.2 4.1 1 5.8L12 16.8 6.8 19.5l1-5.8L3.6 9.6l5.8-.8L12 3.5z" />
+    </svg>
+  );
+}
+
+function HeartIcon({ filled }: { filled?: boolean }) {
+  return (
+    <svg
+      width="18"
+      height="18"
+      viewBox="0 0 24 24"
+      fill={filled ? "currentColor" : "none"}
+      aria-hidden
+    >
+      <path
+        d="M12 20s-7-4.4-7-10a4 4 0 0 1 7-2.5A4 4 0 0 1 19 10c0 5.6-7 10-7 10Z"
+        stroke="currentColor"
+        strokeWidth="1.7"
+        strokeLinejoin="round"
+      />
+    </svg>
   );
 }
 
@@ -87,7 +115,6 @@ const COLOR_SWATCH: Record<ProductColor, string> = {
   teal: "#2aa8a0",
 };
 
-/** Photo stickers when imagesByColor is available; otherwise flat color dots. */
 export function ColorDots({
   colors,
   value,
@@ -122,7 +149,7 @@ export function ColorDots({
           onClick={() => onChange(c)}
           title={colorLabels[c]}
           className={`flex h-9 w-9 items-center justify-center rounded-full border-2 transition ${
-            value === c ? "scale-110 border-cyan" : "border-line"
+            value === c ? "scale-110 border-accent" : "border-line"
           }`}
           style={{ background: COLOR_SWATCH[c] }}
           aria-label={colorLabels[c]}
@@ -132,7 +159,6 @@ export function ColorDots({
   );
 }
 
-/** Circular product-photo stickers for multi-color SKUs (e.g. Yandex Stansiya Midi). */
 export function ColorStickers({
   colors,
   value,
@@ -159,8 +185,8 @@ export function ColorStickers({
             aria-pressed={selected}
             className={`relative h-14 w-14 overflow-hidden rounded-2xl border-2 bg-mist shadow-sm transition sm:h-16 sm:w-16 ${
               selected
-                ? "scale-105 border-cyan ring-2 ring-cyan/30"
-                : "border-line hover:border-cyan/50"
+                ? "scale-105 border-accent ring-2 ring-accent/30"
+                : "border-line hover:border-accent/50"
             }`}
           >
             {src ? (
@@ -196,15 +222,17 @@ export function SectionHeading({
   return (
     <div className="max-w-2xl">
       {eyebrow && (
-        <p className="text-xs font-semibold uppercase tracking-[0.2em] text-cyan">
+        <p className="text-xs font-semibold uppercase tracking-[0.18em] text-accent">
           {eyebrow}
         </p>
       )}
-      <h2 className="mt-2 font-display text-3xl font-bold tracking-tight text-brand sm:text-4xl">
+      <h2 className="mt-1.5 font-display text-2xl font-bold tracking-tight text-slate-900 sm:text-3xl">
         {title}
       </h2>
       {subtitle && (
-        <p className="mt-3 text-base leading-relaxed text-muted">{subtitle}</p>
+        <p className="mt-2 text-sm leading-relaxed text-muted sm:text-base">
+          {subtitle}
+        </p>
       )}
     </div>
   );

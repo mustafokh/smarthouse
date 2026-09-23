@@ -33,7 +33,7 @@ export default function CartPage() {
       : cartTotal;
 
   return (
-    <div className="bg-circuit min-h-screen">
+    <div className="soft-page min-h-screen">
       <div className="mx-auto max-w-6xl px-4 py-12 sm:px-6">
         <SectionHeading
           eyebrow="Savat"
@@ -44,11 +44,11 @@ export default function CartPage() {
         />
 
         {cart.length === 0 ? (
-          <div className="mt-12 rounded-2xl border border-dashed border-line bg-white/70 p-12 text-center">
+          <div className="mt-12 rounded-[1.5rem] border border-dashed border-line bg-white/80 p-12 text-center">
             <p className="text-muted">Hali hech narsa qo‘shilmagan.</p>
             <Link
               href="/katalog"
-              className="mt-6 inline-block rounded-xl bg-cyan px-6 py-3 text-sm font-bold text-brand"
+              className="mt-6 inline-block rounded-full bg-accent px-6 py-3 text-sm font-bold text-white"
             >
               Katalogga o‘tish
             </Link>
@@ -130,20 +130,20 @@ export default function CartPage() {
               })}
             </ul>
 
-            <aside className="h-fit space-y-4 rounded-2xl border border-line bg-brand p-6 text-white">
-              <h2 className="font-display text-lg font-bold">Jami</h2>
+            <aside className="h-fit space-y-4 rounded-[1.6rem] border border-line bg-white p-6 shadow-[0_12px_40px_-16px_rgba(15,23,42,0.14)]">
+              <h2 className="font-display text-lg font-bold text-slate-900">Jami</h2>
               <dl className="space-y-2 text-sm">
-                <div className="flex justify-between text-white/80">
+                <div className="flex justify-between text-muted">
                   <dt>Mahsulotlar</dt>
-                  <dd>{formatPrice(cartTotal)}</dd>
+                  <dd className="font-medium text-slate-800">{formatPrice(cartTotal)}</dd>
                 </div>
-                <div className="flex justify-between text-white/80">
+                <div className="flex justify-between text-muted">
                   <dt>Yetkazib berish</dt>
-                  <dd>{DELIVERY.shortCart}</dd>
+                  <dd className="font-medium text-slate-800">{DELIVERY.shortCart}</dd>
                 </div>
-                <div className="flex justify-between border-t border-white/15 pt-3 font-display text-xl font-bold">
+                <div className="flex justify-between border-t border-line pt-3 font-display text-xl font-bold text-slate-900">
                   <dt>Jami</dt>
-                  <dd className="text-cyan">{formatPrice(displayTotal)}</dd>
+                  <dd className="text-accent">{formatPrice(displayTotal)}</dd>
                 </div>
               </dl>
 
@@ -151,17 +151,17 @@ export default function CartPage() {
                 total={cartTotal}
                 value={paymentMethod}
                 onChange={setPaymentMethod}
-                variant="dark"
+                variant="light"
               />
 
               <InstallServiceChoice
                 value={needsInstall}
                 onChange={setNeedsInstall}
-                variant="dark"
+                variant="light"
               />
 
               {needsInstall === null ? (
-                <p className="rounded-xl bg-white/10 px-3 py-2 text-xs text-white/80">
+                <p className="rounded-xl bg-accent-tint px-3 py-2 text-xs text-accent">
                   Davom etishdan oldin o‘rnatish xizmatini tanlang.
                 </p>
               ) : null}
@@ -176,10 +176,10 @@ export default function CartPage() {
                   if (needsInstall === null) e.preventDefault();
                 }}
                 aria-disabled={needsInstall === null}
-                className={`mt-2 block rounded-xl py-3.5 text-center text-sm font-bold ${
+                className={`mt-2 block rounded-full py-3.5 text-center text-sm font-bold ${
                   needsInstall === null
-                    ? "cursor-not-allowed bg-white/20 text-white/50"
-                    : "bg-cyan text-brand hover:bg-cyan-soft"
+                    ? "cursor-not-allowed bg-slate-200 text-slate-400"
+                    : "bg-accent text-white shadow-lg shadow-blue-500/30 hover:bg-accent-soft"
                 }`}
               >
                 Buyurtmani rasmiylashtirish

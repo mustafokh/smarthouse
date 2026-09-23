@@ -3,155 +3,163 @@ import Link from "next/link";
 import { ProductCard, SectionHeading } from "@/components/ProductCard";
 import { categories, getFeaturedProducts, products } from "@/data/products";
 
+const CAT_ICON: Record<string, string> = {
+  viklyuchatellar: "⚡",
+  rele: "🔌",
+  sensorlar: "📡",
+  shlyuzlar: "🏠",
+  karnizlar: "🪟",
+  iqlim: "🌡️",
+  yoritish: "💡",
+  kolonkalar: "🔊",
+};
+
 export default function HomePage() {
   const featured = getFeaturedProducts();
 
   return (
-    <>
-      {/* Full-bleed hero — brand first */}
-      <section className="bg-hero relative min-h-[92vh] overflow-hidden text-white">
-        <div
-          className="pointer-events-none absolute -right-20 top-10 h-72 w-72 rounded-full bg-cyan/30 blur-3xl animate-pulse-soft"
-          aria-hidden
-        />
-        <div
-          className="pointer-events-none absolute bottom-10 left-10 h-56 w-56 rounded-full bg-cyan/20 blur-3xl animate-drift"
-          aria-hidden
-        />
-        <div
-          className="pointer-events-none absolute inset-0 opacity-30"
-          style={{
-            backgroundImage:
-              "repeating-linear-gradient(-35deg, transparent, transparent 22px, rgba(47,182,217,0.12) 22px, rgba(47,182,217,0.12) 23px)",
-          }}
-          aria-hidden
-        />
-
-        <div className="relative mx-auto flex min-h-[92vh] max-w-6xl flex-col justify-center px-4 py-20 sm:px-6 lg:flex-row lg:items-center lg:gap-12">
-          <div className="max-w-xl lg:max-w-2xl">
-            <p className="animate-rise font-display text-sm font-semibold uppercase tracking-[0.28em] text-cyan">
-              smart.house777
-            </p>
-            <h1 className="animate-rise-delay mt-4 font-display text-5xl font-extrabold leading-[1.05] tracking-tight sm:text-6xl lg:text-7xl">
-              Uyingizni
-              <span className="block text-cyan">aqlli boshqaring</span>
-            </h1>
-            <p className="animate-rise-delay-2 mt-6 max-w-lg text-lg leading-relaxed text-white/75">
-              Karnizlar, Zigbee shlyuzlar, sensorlar va sensorni viklyuchatellar
-              — professional katalogdan tanlang va buyurtma bering.
-            </p>
-            <div className="animate-rise-delay-2 mt-10 flex flex-wrap gap-3">
+    <div className="soft-page">
+      <div className="mx-auto max-w-6xl px-4 pb-16 pt-6 sm:px-6">
+        {/* Promo banner — Smarto style */}
+        <section className="promo-banner animate-rise relative overflow-hidden rounded-[1.75rem] px-6 py-8 text-white shadow-[0_20px_50px_-20px_rgba(37,99,235,0.55)] sm:px-10 sm:py-10">
+          <div
+            className="pointer-events-none absolute -right-6 top-1/2 h-40 w-40 -translate-y-1/2 rounded-full bg-white/15 blur-2xl sm:h-56 sm:w-56"
+            aria-hidden
+          />
+          <div className="relative flex flex-col items-start justify-between gap-8 sm:flex-row sm:items-center">
+            <div className="max-w-md">
+              <p className="text-xs font-semibold uppercase tracking-[0.2em] text-white/80">
+                smart.house777
+              </p>
+              <h1 className="mt-2 font-display text-3xl font-extrabold leading-tight sm:text-4xl">
+                SMART LIVING
+                <span className="block">STARTS HERE</span>
+              </h1>
+              <p className="mt-3 text-sm text-white/85 sm:text-base">
+                Zigbee, Wi-Fi va smart kolonkalr — professional katalog.
+              </p>
               <Link
                 href="/katalog"
-                className="rounded-xl bg-cyan px-7 py-3.5 text-sm font-bold text-brand shadow-lg shadow-cyan/25 transition hover:bg-cyan-soft"
+                className="mt-6 inline-flex rounded-full bg-white px-6 py-3 text-sm font-bold text-accent shadow-lg transition hover:bg-slate-50"
               >
                 Katalogni ochish
               </Link>
-              <Link
-                href="/aloqa"
-                className="rounded-xl border border-white/30 bg-white/5 px-7 py-3.5 text-sm font-semibold text-white backdrop-blur transition hover:bg-white/10"
-              >
-                Konsultatsiya
-              </Link>
+            </div>
+            <div className="relative h-36 w-36 shrink-0 animate-float sm:h-44 sm:w-44">
+              <div className="absolute inset-0 rounded-[2rem] bg-white/20 backdrop-blur-sm" />
+              <Image
+                src="/logo-mark.png"
+                alt=""
+                fill
+                className="object-contain p-6"
+                priority
+              />
             </div>
           </div>
+        </section>
 
-          <div className="relative mt-14 hidden flex-1 lg:mt-0 lg:block">
-              <div className="relative mx-auto aspect-square max-w-md">
-              <div className="absolute inset-8 rounded-full border border-cyan/30 animate-pulse-soft" />
-              <div className="absolute inset-16 rounded-full border border-white/10" />
-              <div className="absolute inset-[22%] overflow-hidden rounded-[2rem] bg-white p-6 shadow-[0_20px_60px_-20px_rgba(47,182,217,0.45)] animate-drift">
-                <Image
-                  src="/logo-mark.png"
-                  alt="smart.house777 logo"
-                  fill
-                  className="object-contain p-8"
-                  priority
-                />
-              </div>
-            </div>
+        {/* Search */}
+        <form action="/katalog" className="animate-rise-delay mt-5">
+          <label className="glass-panel flex items-center gap-3 rounded-2xl px-4 py-3.5">
+            <SearchIcon />
+            <input
+              name="q"
+              type="search"
+              placeholder="Mahsulot yoki kod qidiring…"
+              className="w-full bg-transparent text-sm text-slate-800 outline-none placeholder:text-slate-400"
+            />
+          </label>
+        </form>
+
+        {/* Categories */}
+        <section className="animate-rise-delay-2 mt-10">
+          <div className="flex items-end justify-between gap-3">
+            <SectionHeading title="Kategoriyalar" />
+            <Link
+              href="/katalog"
+              className="text-sm font-semibold text-accent hover:underline"
+            >
+              Barchasi
+            </Link>
           </div>
-        </div>
-      </section>
-
-      {/* Categories */}
-      <section className="bg-circuit border-b border-line py-20">
-        <div className="mx-auto max-w-6xl px-4 sm:px-6">
-          <SectionHeading
-            eyebrow="Kategoriyalar"
-            title="Nimani qidiryapsiz?"
-            subtitle="Dizayn faylidagi vitrina logikasi: kategoriyalar bo‘yicha tez tanlash."
-          />
-          <div className="mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-            {categories.map((cat, i) => (
+          <div className="mt-5 flex gap-4 overflow-x-auto pb-2 scrollbar-none">
+            {categories.map((cat) => (
               <Link
                 key={cat.id}
                 href={`/kategoriya/${cat.slug}`}
-                className="group rounded-2xl border border-line bg-surface/90 p-6 transition hover:border-cyan hover:shadow-[0_12px_40px_-24px_rgba(47,182,217,0.6)]"
-                style={{ animationDelay: `${i * 40}ms` }}
+                className="flex w-[5.5rem] shrink-0 flex-col items-center gap-2"
               >
-                <p className="text-xs font-semibold uppercase tracking-wider text-cyan">
-                  {cat.icon}
-                </p>
-                <h3 className="mt-2 font-display text-xl font-bold text-brand group-hover:text-brand">
+                <span className="flex h-16 w-16 items-center justify-center rounded-3xl bg-white text-2xl shadow-[0_10px_28px_-12px_rgba(15,23,42,0.18)] transition hover:-translate-y-0.5 hover:shadow-[0_14px_32px_-12px_rgba(59,130,246,0.3)]">
+                  {CAT_ICON[cat.id] ?? "📦"}
+                </span>
+                <span className="line-clamp-2 text-center text-[11px] font-medium leading-tight text-slate-600">
                   {cat.name}
-                </h3>
-                <p className="mt-2 text-sm leading-relaxed text-muted">
-                  {cat.description}
-                </p>
-                <span className="mt-4 inline-block text-sm font-semibold text-cyan">
-                  Ko‘rish →
                 </span>
               </Link>
             ))}
           </div>
-        </div>
-      </section>
+        </section>
 
-      {/* Featured */}
-      <section className="py-20">
-        <div className="mx-auto max-w-6xl px-4 sm:px-6">
-          <div className="flex flex-wrap items-end justify-between gap-4">
+        {/* Products */}
+        <section className="mt-12">
+          <div className="flex flex-wrap items-end justify-between gap-3">
             <SectionHeading
-              eyebrow="Tanlangan"
-              title="Mashhur qurilmalar"
-              subtitle={`${products.length} ta mahsulot — to‘liq prayslistdan.`}
+              title="Bizning mahsulotlar"
+              subtitle={`${products.length} ta qurilma — tanlang va buyurtma bering.`}
             />
             <Link
               href="/katalog"
-              className="text-sm font-semibold text-cyan hover:underline"
+              className="text-sm font-semibold text-accent hover:underline"
             >
-              Barchasini ko‘rish →
+              Ko‘proq →
             </Link>
           </div>
-          <div className="mt-10 grid grid-cols-2 gap-3 sm:gap-4 md:grid-cols-3 lg:grid-cols-4">
+          <div className="mt-6 grid grid-cols-2 gap-3 sm:gap-4 md:grid-cols-3 lg:grid-cols-4">
             {featured.map((p) => (
               <ProductCard key={p.id} product={p} />
             ))}
           </div>
-        </div>
-      </section>
+        </section>
 
-      {/* CTA band */}
-      <section className="border-y border-line bg-brand py-16 text-white">
-        <div className="mx-auto flex max-w-6xl flex-col items-start justify-between gap-8 px-4 sm:flex-row sm:items-center sm:px-6">
+        {/* Soft CTA */}
+        <section className="mt-14 soft-card flex flex-col items-start justify-between gap-6 px-6 py-8 sm:flex-row sm:items-center sm:px-8">
           <div>
-            <h2 className="font-display text-3xl font-bold">
-              Buyurtma berish oson
+            <h2 className="font-display text-xl font-bold text-slate-900 sm:text-2xl">
+              Toshkent bo‘ylab yetkazish bepul
             </h2>
-            <p className="mt-2 max-w-lg text-white/70">
-              Savatga qo‘shing, ma’lumotlaringizni qoldiring.{" "}
-              Toshkent shahar bo‘ylab yetkazib berish — bepul.
+            <p className="mt-1 text-sm text-muted">
+              Nasiya, o‘rnatish xizmati va tez buyurtma — barchasi bir joyda.
             </p>
           </div>
           <Link
             href="/katalog"
-            className="shrink-0 rounded-xl bg-cyan px-7 py-3.5 text-sm font-bold text-brand hover:bg-cyan-soft"
+            className="shrink-0 rounded-full bg-accent px-6 py-3 text-sm font-bold text-white shadow-lg shadow-blue-500/30 hover:bg-accent-soft"
           >
             Xaridni boshlash
           </Link>
-        </div>
-      </section>
-    </>
+        </section>
+      </div>
+    </div>
+  );
+}
+
+function SearchIcon() {
+  return (
+    <svg
+      width="18"
+      height="18"
+      viewBox="0 0 24 24"
+      fill="none"
+      className="shrink-0 text-slate-400"
+      aria-hidden
+    >
+      <circle cx="11" cy="11" r="7" stroke="currentColor" strokeWidth="1.8" />
+      <path
+        d="M20 20l-3.5-3.5"
+        stroke="currentColor"
+        strokeWidth="1.8"
+        strokeLinecap="round"
+      />
+    </svg>
   );
 }
